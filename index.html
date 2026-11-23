@@ -1,0 +1,1595 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="favicon.png">
+<title>HKCARE · Hệ thống quản lý nhà thuốc</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#152a21;--mute:#5f756b;--line:#d8ece2;--bg:#edf7f2;--card:#fcfffe;
+  --pri:#2ca66f;--pri-d:#1d7d51;--pri-l:#dff3ea;
+  --acc:#ebb449;--red:#cf4a42;--red-l:#fbeae8;--blue:#2f78c4;--blue-l:#e5f1fc;
+  --amb-l:#fdf2d6;--amb:#8f6106;--r:14px;
+  --sh:0 1px 2px rgba(21,42,33,.04),0 8px 22px -10px rgba(29,125,81,.14)
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Be Vietnam Pro','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+.app{display:flex;min-height:100vh}
+.sidebar{width:264px;flex-shrink:0;background:linear-gradient(180deg,#64c796 0%,#3da976 52%,#28895c 100%);color:#fff;padding:22px 14px;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+.logo{padding:4px 4px 20px}.logo-card{background:#fcfffe;border-radius:16px;padding:14px;box-shadow:0 4px 14px rgba(15,60,39,.12)}.logo-card img{display:block;width:100%;height:auto}.logo span{display:block;margin-top:10px;font-size:11.5px;color:rgba(255,255,255,.94);text-align:center}
+#menu{flex:1}
+#menu a{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;color:rgba(255,255,255,.96);cursor:pointer;font-size:13.5px;margin-bottom:3px;transition:background .15s}
+#menu a em{font-style:normal;width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:16px;flex-shrink:0}
+#menu a small{display:block;font-size:11px;color:rgba(255,255,255,.82)}
+#menu a:hover{background:rgba(255,255,255,.16)}
+#menu a.active{background:#fcfffe;color:var(--pri-d);font-weight:600;box-shadow:0 4px 12px rgba(16,66,43,.12)}
+#menu a.active em{background:var(--pri-l)}
+#menu a.active small{color:var(--mute)}
+.main{flex:1;min-width:0;padding:28px 36px 48px}
+.page-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.page-header h1{font-size:25px;font-weight:700;letter-spacing:-.3px}
+.page-header p{color:var(--mute);font-size:13px;margin-top:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border:1px solid transparent;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;transition:transform .1s,background .15s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.6;cursor:wait}
+.btn-primary{background:var(--pri);color:#fff}.btn-primary:hover{background:var(--pri-d)}
+.btn-success{background:var(--pri);color:#fff}.btn-success:hover{background:var(--pri-d)}
+.btn-outline{background:#fcfffe;border-color:var(--line);color:var(--ink)}.btn-outline:hover{border-color:var(--pri);color:var(--pri-d);background:var(--pri-l)}
+.btn-danger{background:var(--red-l);color:var(--red)}.btn-danger:hover{background:var(--red);color:#fff}
+.btn-sm{padding:4px 10px;font-size:12px;border-radius:8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--sh);margin-bottom:18px}
+.card h3{font-size:15px;font-weight:600;margin-bottom:14px}
+.field{width:100%;padding:10px 13px;border:1px solid var(--line);border-radius:10px;background:#fcfffe;transition:border .15s,box-shadow .15s}
+.field:focus{outline:0;border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-l)}
+.toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}.toolbar select{width:185px;border-radius:999px;padding-left:16px}
+.searchbox{flex:1;min-width:220px;display:flex;align-items:center;gap:8px;background:#fcfffe;border:1px solid var(--line);border-radius:999px;padding:0 6px 0 16px;box-shadow:var(--sh);transition:border .15s,box-shadow .15s}
+.searchbox:focus-within{border-color:var(--pri);box-shadow:0 0 0 3px var(--pri-l)}
+.searchbox>svg{flex-shrink:0;color:var(--mute)}
+.searchbox input{flex:1;min-width:0;border:0;outline:0;background:none;padding:11px 0}
+.lens-btn{width:38px;height:38px;border-radius:50%;border:0;background:none;display:grid;place-items:center;cursor:pointer;color:var(--ink);transition:background .15s}
+.lens-btn:hover{background:var(--pri-l);color:var(--pri-d)}
+.tbl-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh);overflow-x:auto}
+table.data{width:100%;border-collapse:collapse;font-size:13px}
+table.data th{text-align:left;padding:12px 16px;font-weight:600;color:var(--mute);font-size:12.5px;background:#e9f5ef;border-bottom:1px solid var(--line);white-space:nowrap}
+table.data td{padding:12px 16px;border-bottom:1px solid #e7f2ec;vertical-align:middle}
+table.data tr:last-child td{border-bottom:0}
+table.data tbody tr:hover{background:#f3faf6}
+.tbl-foot{padding:12px 16px;color:var(--mute);font-size:12.5px;border-top:1px solid var(--line);background:#f7fcf9}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600}
+.badge.active{background:var(--pri-l);color:var(--pri-d)}.badge.pending{background:var(--amb-l);color:var(--amb)}
+.badge.draft{background:#e7efeb;color:#52665c}.badge.info{background:var(--blue-l);color:var(--blue)}
+.badge.rx{background:#fee8e6;color:#b8322a}.badge.otc{background:#e1f5eb;color:#1b7a4e}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
+.stat-card{background:var(--card);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh);cursor:pointer;display:flex;gap:14px;align-items:center;border:1px solid var(--line);transition:border .15s,transform .12s}
+.stat-card:hover{border-color:var(--pri);transform:translateY(-1px)}
+.stat-card .ico{width:48px;height:48px;border-radius:14px;background:var(--pri-l);display:grid;place-items:center;font-size:23px;flex-shrink:0}
+.stat-card .num{font-size:24px;font-weight:700;line-height:1.1}
+.stat-card .lbl{font-size:12.5px;color:var(--mute)}
+.stat-card .sub{font-size:11.5px;color:var(--red);font-weight:600;margin-top:2px}
+.pos{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start}
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(156px,1fr));gap:10px;max-height:560px;overflow-y:auto;padding:2px}
+.product-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px;cursor:pointer;transition:border .15s,box-shadow .15s}
+.product-card:hover{border-color:var(--pri);box-shadow:0 6px 16px -8px rgba(44,166,111,.45)}
+.product-card h4{font-size:13px;font-weight:600;line-height:1.35;min-height:35px}
+.product-card p{font-size:11.5px;color:var(--mute)}
+.product-card .price{color:var(--pri-d);font-weight:700;font-size:14px;margin-top:4px}
+.total-line{display:flex;justify-content:space-between;padding:6px 0}
+.total-line.grand{font-size:18px;font-weight:700;border-top:1px dashed var(--line);margin-top:10px;padding-top:12px}
+.total-line.grand span:last-child{color:var(--pri-d)}
+.pay-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.pay-method{border:1.5px solid var(--line);border-radius:12px;padding:12px 6px;text-align:center;cursor:pointer;background:#fcfffe;transition:.15s}
+.pay-method:hover{border-color:#8ed2b2}
+.pay-method.selected{border-color:var(--pri);background:var(--pri-l)}
+.pay-method .ico{font-size:24px;display:block;margin-bottom:4px}
+.pay-method b{font-size:12px;font-weight:600}
+.img-source-buttons{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:10px}
+.img-source-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:24px 12px;border:2px dashed #9fd4bc;border-radius:14px;background:#f3faf6;cursor:pointer}
+.img-source-btn:hover{border-color:var(--pri);background:var(--pri-l)}
+.img-source-btn .ico{font-size:32px}.img-source-btn small{color:var(--mute)}
+.preview-box{height:240px;background:var(--bg);border-radius:14px;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:12px;border:1px solid var(--line)}
+.preview-box img{max-width:100%;max-height:100%;object-fit:contain}
+.results-list{max-height:290px;overflow-y:auto}
+.result-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;cursor:pointer}
+.result-item:hover{border-color:var(--pri);background:#f3faf6}
+.result-item .meta{flex:1}.result-item small{display:block;color:var(--mute)}
+.result-item .score{font-size:12px;font-weight:700;color:var(--pri-d);background:var(--pri-l);padding:3px 10px;border-radius:20px}
+.qr-box{text-align:center;padding:6px}
+.qr-box img{max-width:240px;border:6px solid #fff;box-shadow:var(--sh);border-radius:14px}
+.bank-info{background:#f3faf6;border:1px solid var(--line);border-radius:12px;padding:6px 14px;margin:12px 0;font-size:13px}
+.bank-info div{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line)}
+.bank-info div:last-child{border:0}.bank-info b{color:var(--pri-d)}
+.modal-overlay{position:fixed;inset:0;background:rgba(16,42,31,.42);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal-overlay.show{display:flex}
+.modal{background:#fcfffe;border:1px solid var(--line);border-radius:18px;padding:26px;width:580px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px -20px rgba(15,48,34,.35);animation:pop .2s ease}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}}
+.modal h2{font-size:19px;margin-bottom:16px}.modal h3{font-size:15px;margin-bottom:10px}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.alert{padding:12px 14px;border-radius:10px;font-size:13px;margin-top:10px}
+.alert.info{background:var(--blue-l);color:var(--blue)}.alert.warn{background:var(--amb-l);color:var(--amb)}.alert.ok{background:var(--pri-l);color:var(--pri-d)}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;padding:13px 20px;border-radius:12px;font-size:13.5px;opacity:0;transform:translateY(16px);transition:.25s;z-index:200;pointer-events:none}
+#toast.show{opacity:1;transform:none}#toast.err{background:var(--red)}
+.hidden{display:none!important}
+.muted{color:var(--mute);font-size:12.5px}
+.loading{text-align:center;padding:40px;color:var(--mute)}
+.stack{display:grid;gap:8px;margin-top:10px}
+.cust-info{background:var(--pri-l);color:var(--pri-d);padding:10px 12px;border-radius:10px;font-size:13px}
+.rx-box{background:#f4fbf7;border:1px solid #b9e2ce;border-radius:12px;padding:12px;margin-top:12px}
+.rx-box.required{background:#fff8f7;border-color:#f3beb9}
+.rx-thumb{max-width:100%;max-height:160px;border-radius:10px;border:1px solid var(--line);margin-top:8px;display:block}
+.user-box{margin-top:16px;padding:14px;background:rgba(13,54,35,.22);border-radius:12px;font-size:12px;color:rgba(255,255,255,.94)}
+.user-box b{display:block;color:#fff;font-size:13.5px}
+.user-box .btn{width:100%;margin-top:10px;background:rgba(255,255,255,.16);color:#fff}.user-box .btn:hover{background:var(--red)}
+.form-group{margin-bottom:14px}.form-group label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
+.auth-screen{min-height:100vh;display:grid;place-items:center;background:linear-gradient(135deg,#8ad8b2,#45b07d);padding:20px}
+.auth-box{background:#fcfffe;border:1px solid var(--line);border-radius:22px;padding:30px 34px;width:420px;max-width:100%;box-shadow:0 26px 70px -24px rgba(17,63,42,.35)}
+.alogo{display:block;width:220px;max-width:75%;margin:0 auto 6px}
+.auth-sub{text-align:center;color:var(--mute);font-size:13px;margin-bottom:20px}
+.auth-tabs{display:flex;background:var(--bg);border-radius:12px;padding:4px;margin-bottom:20px}
+.auth-tab{flex:1;padding:9px;border:0;background:none;border-radius:9px;font-weight:600;color:var(--mute);cursor:pointer}
+.auth-tab.active{background:#fcfffe;color:var(--pri-d);box-shadow:var(--sh)}
+.act{display:flex;gap:6px;flex-wrap:wrap}
+.th{position:relative;display:grid;place-items:center;overflow:hidden;background:var(--pri-l);border-radius:10px;flex-shrink:0;border:1px solid #d7ece2}
+.th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#fff}
+.th.sm{width:46px;height:46px;font-size:20px}.th.lg{width:54px;height:54px;font-size:22px}.th.md{width:100%;height:104px;font-size:36px;margin-bottom:8px}
+@media(max-width:900px){
+.app{flex-direction:column}
+.sidebar{width:100%;height:auto;position:static;padding:14px}
+.logo{padding-bottom:12px}
+#menu{display:flex;gap:6px;overflow-x:auto}#menu a{white-space:nowrap;margin:0}#menu a small{display:none}
+.main{padding:20px 16px 40px}.pos{grid-template-columns:1fr}.toolbar{flex-direction:column}.toolbar select{width:100%}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-box">
+    <img class="alogo" src="logo.png" alt="HKCARE">
+    <div class="auth-sub">Hệ thống quản lý nhà thuốc</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login',this)">Đăng nhập</button>
+      <button class="auth-tab" onclick="switchAuthTab('register',this)">Đăng ký</button>
+    </div>
+    <form id="login-form" onsubmit="handleLogin(event)">
+      <div class="form-group"><label>Tên đăng nhập</label><input class="field" id="login-username" value="huy" required></div>
+      <div class="form-group"><label>Mật khẩu</label><input class="field" type="password" id="login-password" value="123456" required></div>
+      <div class="alert warn hidden" id="login-error"></div>
+      <button class="btn btn-primary" id="login-btn" style="width:100%;padding:13px;margin-top:10px">Đăng nhập</button>
+    </form>
+    <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
+      <div class="form-group"><label>Họ tên *</label><input class="field" id="reg-hoten" required></div>
+      <div class="form-group"><label>Tên đăng nhập *</label><input class="field" id="reg-username" required></div>
+      <div class="form-group"><label>Mật khẩu * (ít nhất 6 ký tự)</label><input class="field" type="password" id="reg-password" minlength="6" required></div>
+      <div class="form-group"><label>Email</label><input class="field" type="email" id="reg-email"></div>
+      <div class="form-group"><label>Số điện thoại</label><input class="field" id="reg-sdt"></div>
+      <div class="form-group"><label>Vai trò *</label><select class="field" id="reg-role"><option value="3">Dược sĩ</option><option value="2">Dược sĩ trưởng</option><option value="1">Quản trị viên</option><option value="4">Khách hàng</option><option value="5">Nhà cung cấp</option></select></div>
+      <div class="alert warn hidden" id="register-error"></div>
+      <button class="btn btn-primary" id="register-btn" style="width:100%;padding:13px;margin-top:10px">Đăng ký</button>
+    </form>
+  </div>
+</div>
+
+<div class="app hidden" id="app">
+  <aside class="sidebar">
+    <div class="logo"><div class="logo-card"><img src="logo.png" alt="HKCARE"></div><span>Hệ thống quản lý nhà thuốc</span></div>
+    <nav id="menu">
+      <a data-page="dashboard"><em>🏠</em><div>Tổng quan<small>Dashboard</small></div></a>
+      <a data-page="uc01"><em>🔐</em><div>Tài khoản & Phân quyền<small>UC01</small></div></a>
+      <a data-page="uc02"><em>💊</em><div>Quản lý hàng hóa & Lô HSD<small>UC02</small></div></a>
+      <a data-page="uc03"><em>📦</em><div>Quản lý nhập kho<small>UC03</small></div></a>
+      <a data-page="uc04a"><em>🧾</em><div>Bán hàng Offline<small>POS · Khuyến mãi</small></div></a>
+      <a data-page="uc04b"><em>🚚</em><div>Bán hàng Online<small>Đơn thuốc · Khuyến mãi</small></div></a>
+      <a data-page="uc05"><em>👥</em><div>Quản lý khách hàng<small>UC05</small></div></a>
+      <a data-page="uc06"><em>🧑‍⚕️</em><div>Quản lý người dùng<small>UC06</small></div></a>
+      <a data-page="uc07"><em>🏭</em><div>Quản lý nhà cung cấp<small>UC07</small></div></a>
+    </nav>
+    <div class="user-box"><b id="sidebar-name">—</b><span id="sidebar-role">—</span>
+      <button class="btn" onclick="handleLogout()">🚪 Đăng xuất</button></div>
+  </aside>
+
+  <main class="main">
+    <div id="conn" class="alert warn hidden" style="margin:0 0 16px">⚠ <b>Chế độ demo ngoại tuyến</b>: đang sử dụng dữ liệu mẫu trong trình duyệt (dữ liệu lô nhập, hạn sử dụng, đơn thuốc và khuyến mãi được đồng bộ xuyên suốt phiên làm việc).</div>
+
+    <section id="page-dashboard" class="hidden">
+      <div class="page-header"><div><h1>Tổng quan</h1><p id="welcome-msg">Tình hình hoạt động của hệ thống</p></div></div>
+      <div class="stat-grid" id="dashboard-stats"></div>
+      <div id="dashboard-products"></div>
+    </section>
+
+    <section id="page-uc01" class="hidden">
+      <div class="page-header"><div><h1>Quản lý tài khoản</h1><p>UC01 · Tài khoản và phân quyền</p></div></div>
+      <h3 style="margin-bottom:10px">Tài khoản</h3>
+      <div id="users-table"><div class="loading">Đang tải…</div></div>
+      <h3 style="margin:22px 0 10px">Phân quyền</h3>
+      <div id="roles-table"><div class="loading">Đang tải…</div></div>
+    </section>
+
+    <section id="page-uc02" class="hidden">
+      <div class="page-header">
+        <div><h1>Quản lý hàng hóa & Hạn sử dụng theo lô</h1><p>UC02 · Danh mục, phân loại kê đơn/không kê đơn, ảnh sản phẩm và quản lý lô nhập</p></div>
+        <button class="btn btn-primary" onclick="openLotModal()">+ Thêm lô nhập / HSD</button>
+      </div>
+      <div class="stat-grid" id="group-stats"></div>
+      <div class="toolbar">
+        <div class="searchbox">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="text" id="search-q" placeholder="Tìm theo tên, mã SP hoặc số lô…" oninput="loadProducts()">
+          <button class="lens-btn" onclick="openImageSearch()" title="Tìm kiếm bằng hình ảnh" aria-label="Tìm kiếm bằng hình ảnh">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V6.5A2.5 2.5 0 0 1 6.5 4H8M16 4h1.5A2.5 2.5 0 0 1 20 6.5V8M20 16v1.5a2.5 2.5 0 0 1-2.5 2.5H16M8 20H6.5A2.5 2.5 0 0 1 4 17.5V16"/><circle cx="12" cy="12" r="3.6"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>
+          </button>
+        </div>
+        <select id="search-group" class="field" onchange="loadProducts()">
+          <option value="">Tất cả nhóm</option>
+          <option value="DM01">Thuốc</option><option value="DM02">TPCN</option>
+          <option value="DM03">Mỹ phẩm</option><option value="DM04">Dụng cụ y tế</option>
+        </select>
+        <select id="search-rx" class="field" onchange="loadProducts()">
+          <option value="">Tất cả loại kê đơn</option>
+          <option value="RX">Thuốc kê đơn (Rx)</option>
+          <option value="OTC">Không kê đơn (OTC)</option>
+        </select>
+      </div>
+      <div id="products-table"><div class="loading">Đang tải…</div></div>
+    </section>
+
+    <section id="page-uc03" class="hidden">
+      <div class="page-header"><div><h1>Quản lý nhập kho</h1><p>UC03 · Đơn đặt hàng nhà cung cấp</p></div></div>
+      <div id="po-table"></div>
+    </section>
+
+    <section id="page-uc04a" class="hidden">
+      <div class="page-header"><div><h1>Bán hàng Offline (POS)</h1><p>Bán tại quầy · Áp dụng khuyến mãi · Nhập đơn thuốc (nếu có thuốc kê đơn)</p></div></div>
+      <div class="pos">
+        <div class="card">
+          <h3>🔍 Chọn sản phẩm</h3>
+          <input type="text" class="field" id="pos-search" placeholder="Tìm sản phẩm…" oninput="renderPosProducts()" style="margin-bottom:12px">
+          <div class="product-grid" id="pos-products"><div class="loading">Đang tải…</div></div>
+        </div>
+        <div class="card">
+          <h3>🛒 Giỏ hàng Offline</h3>
+          <div class="tbl-wrap" style="box-shadow:none;border:1px solid var(--line)"><table class="data">
+            <thead><tr><th>Sản phẩm</th><th>SL</th><th>Thành tiền</th><th></th></tr></thead>
+            <tbody id="cart-body"></tbody>
+          </table></div>
+
+          <div class="form-group" style="margin-top:12px">
+            <label>🎁 Khuyến mãi áp dụng</label>
+            <select class="field" id="pos-promo" onchange="renderCart()"></select>
+          </div>
+
+          <div id="pos-rx-box" class="rx-box required hidden">
+            <b style="color:var(--red)">🩺 Giỏ hàng có thuốc kê đơn (Rx) — Bắt buộc nhập đơn thuốc Offline</b>
+            <div class="stack">
+              <input type="text" class="field" id="pos-rx-code" placeholder="Mã đơn thuốc / Số sổ khám *">
+              <input type="text" class="field" id="pos-rx-doctor" placeholder="Bác sĩ / Bệnh viện / Phòng khám kê đơn *">
+              <input type="text" class="field" id="pos-rx-patient" placeholder="Tên người bệnh & ghi chú liều dùng">
+            </div>
+          </div>
+
+          <div class="total-line" style="margin-top:10px"><span>Tạm tính</span><span id="pos-subtotal">0đ</span></div>
+          <div class="total-line" style="color:var(--pri-d)"><span>Giảm khuyến mãi</span><span id="pos-discount">-0đ</span></div>
+          <div class="total-line grand"><span>Tổng thanh toán</span><span id="grandtotal">0đ</span></div>
+
+          <div class="pay-methods">
+            <div class="pay-method selected" data-method="cash" onclick="selectPayMethod('cash')"><span class="ico">💵</span><b>Tiền mặt</b></div>
+            <div class="pay-method" data-method="qr" onclick="selectPayMethod('qr')"><span class="ico">📱</span><b>QR Code</b></div>
+            <div class="pay-method" data-method="bank" onclick="selectPayMethod('bank')"><span class="ico">🏦</span><b>Ngân hàng</b></div>
+          </div>
+          <button class="btn btn-success" style="width:100%;padding:13px" onclick="checkoutPOS()">✅ Thanh toán & In hóa đơn</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="page-uc04b" class="hidden">
+      <div class="page-header"><div><h1>Bán hàng Online</h1><p>Đặt hàng giao tận nơi · Chụp/tải đơn thuốc lưu hệ thống · Áp dụng khuyến mãi</p></div></div>
+      <div class="pos">
+        <div class="card">
+          <h3>🔍 Chọn sản phẩm Online</h3>
+          <input type="text" class="field" id="online-search" placeholder="Tìm sản phẩm…" oninput="renderOnlineProducts()" style="margin-bottom:12px">
+          <div class="product-grid" id="online-products"><div class="loading">Đang tải…</div></div>
+        </div>
+        <div>
+          <div class="card">
+            <h3>👤 Khách hàng</h3>
+            <div id="online-lookup" style="display:flex;gap:8px">
+              <input type="text" class="field" id="online-phone" placeholder="SĐT khách">
+              <button class="btn btn-outline" onclick="lookupOnlineCustomer()">Tra cứu</button>
+            </div>
+            <div class="cust-info muted" id="online-customer-info" style="margin-top:10px">Chưa có khách hàng</div>
+            <div class="stack">
+              <input type="text" class="field" id="online-address" placeholder="Địa chỉ giao hàng *">
+              <input type="text" class="field" id="online-note" placeholder="Ghi chú đơn">
+            </div>
+          </div>
+          <div class="card">
+            <h3>🛒 Giỏ hàng Online</h3>
+            <div class="tbl-wrap" style="box-shadow:none;border:1px solid var(--line)"><table class="data">
+              <thead><tr><th>Sản phẩm</th><th>SL</th><th>Thành tiền</th><th></th></tr></thead>
+              <tbody id="online-cart-body"></tbody>
+            </table></div>
+
+            <div class="form-group" style="margin-top:12px">
+              <label>🎁 Khuyến mãi áp dụng</label>
+              <select class="field" id="online-promo" onchange="renderOnlineCart()"></select>
+            </div>
+
+            <div id="online-rx-box" class="rx-box required hidden">
+              <b style="color:var(--red)">📷 Đơn thuốc bắt buộc cho thuốc kê đơn Online</b>
+              <p class="muted" style="margin-top:3px">Vui lòng chụp ảnh hoặc chọn ảnh đơn thuốc rõ nét để lưu vào hệ thống.</p>
+              <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+                <button type="button" class="btn btn-outline btn-sm" onclick="openRxCamera()">📷 Chụp đơn thuốc</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('online-rx-file').click()">🖼️ Tải ảnh đơn thuốc</button>
+                <input type="file" id="online-rx-file" accept="image/*" class="hidden" onchange="handleOnlineRxUpload(event)">
+              </div>
+              <div id="online-rx-camera-wrap" class="hidden" style="margin-top:10px">
+                <video id="online-rx-video" autoplay playsinline muted style="width:100%;max-height:170px;border-radius:10px;background:#000"></video>
+                <div style="display:flex;gap:8px;margin-top:6px">
+                  <button type="button" class="btn btn-primary btn-sm" onclick="captureOnlineRxPhoto()">📸 Chụp lưu ảnh</button>
+                  <button type="button" class="btn btn-outline btn-sm" onclick="stopOnlineRxCamera()">Đóng camera</button>
+                </div>
+              </div>
+              <img id="online-rx-preview" class="rx-thumb hidden" alt="Ảnh đơn thuốc">
+              <div id="online-rx-saved-status" class="muted" style="margin-top:6px">Chưa có ảnh đơn thuốc được lưu</div>
+            </div>
+
+            <div class="total-line" style="margin-top:10px"><span>Tạm tính</span><span id="online-subtotal">0đ</span></div>
+            <div class="total-line" style="color:var(--pri-d)"><span>Giảm khuyến mãi</span><span id="online-discount">-0đ</span></div>
+            <div class="total-line grand"><span>Tổng thanh toán</span><span id="online-grandtotal">0đ</span></div>
+
+            <div class="pay-methods">
+              <div class="pay-method selected" data-method="cash" onclick="selectOnlinePayMethod('cash')"><span class="ico">💵</span><b>COD</b></div>
+              <div class="pay-method" data-method="qr" onclick="selectOnlinePayMethod('qr')"><span class="ico">📱</span><b>QR Code</b></div>
+              <div class="pay-method" data-method="bank" onclick="selectOnlinePayMethod('bank')"><span class="ico">🏦</span><b>Ngân hàng</b></div>
+            </div>
+            <button class="btn btn-success" style="width:100%;padding:13px" onclick="checkoutOnline()">✅ Đặt hàng Online</button>
+          </div>
+        </div>
+      </div>
+      <div class="card"><h3>📋 Đơn hàng Online (kèm đơn thuốc đã lưu & khuyến mãi)</h3><div id="orders-table"><div class="loading">Đang tải…</div></div></div>
+    </section>
+
+    <section id="page-uc05" class="hidden">
+      <div class="page-header"><div><h1>Khách hàng</h1><p>UC05 · Thông tin, lịch sử mua hàng và điểm tích lũy</p></div>
+        <button class="btn btn-primary" onclick="openCustomerModal()">+ Thêm khách hàng</button></div>
+      <div class="toolbar"><div class="searchbox"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="text" id="customer-q" placeholder="Tìm theo tên, SĐT, mã KH, email…" oninput="loadCustomers()"></div><span class="muted" id="customer-count"></span></div>
+      <div id="customers-table"><div class="loading">Đang tải…</div></div>
+    </section>
+
+    <section id="page-uc06" class="hidden">
+      <div class="page-header"><div><h1>Người dùng</h1><p>UC06 · Quản trị viên, dược sĩ trưởng, dược sĩ</p></div></div>
+      <div id="users-table2"><div class="loading">Đang tải…</div></div>
+    </section>
+
+    <section id="page-uc07" class="hidden">
+      <div class="page-header"><div><h1>Nhà cung cấp</h1><p>UC07 · Đối tác, công nợ và lịch sử giao dịch</p></div>
+        <button class="btn btn-primary" onclick="openSupplierModal()">+ Thêm nhà cung cấp</button></div>
+      <div class="toolbar"><div class="searchbox"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="text" id="supplier-q" placeholder="Tìm theo tên, mã NCC, SĐT, email…" oninput="loadSuppliers()"></div><span class="muted" id="supplier-count"></span></div>
+      <div id="suppliers-table"><div class="loading">Đang tải…</div></div>
+    </section>
+  </main>
+</div>
+
+<!-- MODAL: TÌM KIẾM HÌNH ẢNH -->
+<div class="modal-overlay" id="modal-imgsearch">
+  <div class="modal" style="width:600px">
+    <h2>🔍 Tìm kiếm bằng hình ảnh</h2>
+    <div id="img-source">
+      <div class="img-source-buttons">
+        <button class="img-source-btn" onclick="openCamera()"><span class="ico">📷</span><b>Chụp ảnh</b><small>Camera</small></button>
+        <button class="img-source-btn" onclick="document.getElementById('file-input').click()"><span class="ico">🖼️</span><b>Thư viện</b><small>Chọn ảnh</small></button>
+      </div>
+      <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFile(event)">
+    </div>
+    <div id="cam-area" class="hidden">
+      <div class="preview-box" style="background:#000"><video id="cam-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover"></video></div>
+      <div class="form-actions">
+        <button class="btn btn-outline" onclick="resetImageSearch()">Hủy</button>
+        <button class="btn btn-primary" onclick="capturePhoto()">📸 Chụp ảnh</button>
+      </div>
+    </div>
+    <div id="img-preview-area" class="hidden">
+      <div class="preview-box"><img id="img-preview" alt="Ảnh xem trước"></div>
+      <div class="form-actions">
+        <button class="btn btn-outline" onclick="resetImageSearch()">↺ Chọn khác</button>
+        <button class="btn btn-primary" id="btn-search-img" onclick="searchByImage()">🔍 Tìm</button>
+      </div>
+    </div>
+    <div id="img-results" class="hidden">
+      <h3>Kết quả (<span id="result-count">0</span>)</h3>
+      <div id="results-list" class="results-list"></div>
+      <div class="form-actions">
+        <button class="btn btn-outline" onclick="resetImageSearch()">Tìm lại</button>
+        <button class="btn btn-primary" onclick="closeModal('modal-imgsearch')">Đóng</button>
+      </div>
+    </div>
+    <div class="form-actions" id="img-cancel"><button class="btn btn-outline" onclick="closeModal('modal-imgsearch')">Hủy</button></div>
+  </div>
+</div>
+
+<!-- MODAL: QUẢN LÝ LÔ NHẬP & HẠN SỬ DỤNG THEO LÔ (KHÔNG MẤT DỮ LIỆU) -->
+<div class="modal-overlay" id="modal-lot">
+  <div class="modal" style="width:640px">
+    <h2 id="lot-modal-title">📦 Quản lý lô nhập & Hạn sử dụng</h2>
+    <div class="form-group">
+      <label>Sản phẩm *</label>
+      <select class="field" id="lot-product" onchange="renderLotHistoryInModal()"></select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div class="form-group"><label>Mã / Số lô nhập *</label><input class="field" id="lot-code" placeholder="VD: LO2611A"></div>
+      <div class="form-group"><label>Hạn sử dụng (HSD) *</label><input class="field" type="date" id="lot-expiry"></div>
+      <div class="form-group"><label>Số lượng lô *</label><input class="field" type="number" min="1" id="lot-qty" value="20"></div>
+    </div>
+    <div class="form-group">
+      <label>Cập nhật ảnh sản phẩm (tùy chọn)</label>
+      <input class="field" type="file" id="lot-image-file" accept="image/*" onchange="previewProductImageFile(event)">
+      <img id="lot-img-preview" class="rx-thumb hidden" alt="Ảnh sản phẩm">
+    </div>
+    <div class="alert info">💡 Thêm lô mới hoặc chỉnh sửa lô sẽ <b>giữ nguyên các lô đã nhập trước đó</b>, tự động tính lại tổng tồn kho và ưu tiên lô có hạn sử dụng gần nhất.</div>
+    <div id="lot-error" class="alert warn hidden"></div>
+    <div style="margin-top:14px">
+      <h3>Danh sách lô nhập hiện có của sản phẩm</h3>
+      <div id="lot-existing-list"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-lot')">Đóng</button>
+      <button class="btn btn-primary" onclick="saveLotEntry()">💾 Lưu lô & HSD</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-payment"><div class="modal" id="payment-content" style="width:520px"></div></div>
+
+<div class="modal-overlay" id="modal-customer"><div class="modal">
+  <h2 id="customer-modal-title">Thêm khách hàng</h2><input type="hidden" id="c-edit-id">
+  <div class="form-group"><label>Họ tên *</label><input class="field" id="c-name"></div><div class="form-group"><label>SĐT *</label><input class="field" id="c-phone"></div>
+  <div class="form-group"><label>Giới tính</label><select class="field" id="c-gender"><option value="">— Chọn —</option><option>Nam</option><option>Nữ</option><option>Khác</option></select></div>
+  <div class="form-group"><label>Email</label><input class="field" id="c-email" type="email"></div>
+  <div class="alert warn hidden" id="customer-error"></div>
+  <div class="form-actions"><button class="btn btn-outline" onclick="closeModal('modal-customer')">Hủy</button><button class="btn btn-primary" onclick="saveCustomer()">Lưu</button></div>
+</div></div>
+
+<div class="modal-overlay" id="modal-customer-detail"><div class="modal" style="width:640px">
+  <h2 id="customer-detail-title">Chi tiết khách hàng</h2><div id="customer-detail-body"></div>
+  <div class="form-actions"><button class="btn btn-outline" onclick="closeModal('modal-customer-detail')">Đóng</button></div>
+</div></div>
+
+<div class="modal-overlay" id="modal-supplier"><div class="modal">
+  <h2 id="supplier-modal-title">Thêm nhà cung cấp</h2><input type="hidden" id="s-edit-id">
+  <div class="form-group"><label>Tên NCC *</label><input class="field" id="s-name"></div><div class="form-group"><label>Mã số thuế</label><input class="field" id="s-tax"></div><div class="form-group"><label>Địa chỉ</label><input class="field" id="s-address"></div><div class="form-group"><label>SĐT</label><input class="field" id="s-phone"></div><div class="form-group"><label>Email</label><input class="field" id="s-email" type="email"></div>
+  <div class="form-group"><label>Ghi chú</label><textarea class="field" id="s-note" rows="2"></textarea></div>
+  <div class="alert warn hidden" id="supplier-error"></div>
+  <div class="form-actions"><button class="btn btn-outline" onclick="closeModal('modal-supplier')">Hủy</button><button class="btn btn-primary" onclick="saveSupplier()">Lưu</button></div>
+</div></div>
+
+<div class="modal-overlay" id="modal-supplier-detail"><div class="modal" style="width:640px">
+  <h2 id="supplier-detail-title">Chi tiết nhà cung cấp</h2><div id="supplier-detail-body"></div>
+  <div class="form-actions"><button class="btn btn-outline" onclick="closeModal('modal-supplier-detail')">Đóng</button></div>
+</div></div>
+
+<div id="toast" role="status"></div>
+
+<script>
+const API_BASE = 'OFFLINE_MODE';
+let CURRENT_TOKEN = localStorage.getItem('hkcare_token');
+let CURRENT_USER = null;
+
+const DEMO = { on: true, db: null };
+
+
+const REAL_PRODUCT_IMAGES = {
+  SP0001: 'paracetamol-500mg.jpg',
+ SP0004: 'Amoxicillin 500mg.jpg',
+  SP0007: 'Omeprazole 20mg.jpg',
+  SP0002: 'Vitamin C 1000mg.jpg',
+  SP0008: 'Omega 3 Fish Oil.jpg',
+  SP0006: 'Sữa rửa mặt Cetaphil.jpg',
+  SP0003: 'Khẩu trang y tế 4 lớp.jpg',
+  SP0005: 'Nước muối sinh lý 0.9%.jpg',
+  SP0009: 'Kem chống nắng Anessa.jpg',
+  SP0010: 'Bông y tế gói 100g.jpg',
+   SP0011: 'Băng keo cá nhân (hộp 20).jpg',
+  SP0012: 'Cồn sát khuẩn 70 độ 500ml.jpg',
+  SP0014: 'Máy đo huyết áp Omron.jpg',
+   SP0016: 'Que thử thai (hộp 2).jpg',
+    SP0017: 'Găng tay y tế (hộp 100).jpg',
+     SP0018: 'Ống nghe y tế.jpg',
+  SP0013: 'Nhiệt kế điện tử.jpg',
+    SP0015: 'Máy đo đường huyết.jpg',
+
+     
+};
+
+function svgDataUrl(svg) {
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg.trim());
+}
+
+
+function buildProductArt(maSP, tenThuoc, donViTinh, maDM, keDon) {
+  if (REAL_PRODUCT_IMAGES[maSP]) {
+    return REAL_PRODUCT_IMAGES[maSP];
+  }
+  const palette = {
+    DM01: { bg1: '#e4f6ed', bg2: '#c5ebd9', top: '#2ca66f', sub: '#1d7d51' },
+    DM02: { bg1: '#fff6e3', bg2: '#fde5b2', top: '#e08e1b', sub: '#995b06' },
+    DM03: { bg1: '#fceef5', bg2: '#f8d2e5', top: '#c9518b', sub: '#852d58' },
+    DM04: { bg1: '#e5f3fc', bg2: '#c5e3f8', top: '#2488c7', sub: '#145885' }
+  }[maDM] || { bg1: '#e4f6ed', bg2: '#c5ebd9', top: '#2ca66f', sub: '#1d7d51' };
+
+  const rxTag = keDon ? 'THUỐC KÊ ĐƠN (Rx)' : `${donViTinh} · ${maSP}`;
+  const shortTitle = tenThuoc.length > 20 ? tenThuoc.slice(0, 19) + '…' : tenThuoc;
+  return svgDataUrl(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" width="220" height="220">
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${palette.bg1}"/>
+          <stop offset="100%" stop-color="${palette.bg2}"/>
+        </linearGradient>
+      </defs>
+      <rect width="220" height="220" rx="20" fill="url(#g)"/>
+      <ellipse cx="110" cy="194" rx="68" ry="7" fill="#152a21" opacity="0.12"/>
+      <rect x="46" y="42" width="128" height="94" rx="12" fill="#ffffff" stroke="${palette.top}" stroke-width="2"/>
+      <rect x="46" y="42" width="128" height="24" rx="12" fill="${palette.top}"/>
+      <text x="110" y="58" font-size="9.5" font-weight="700" fill="#ffffff" font-family="Segoe UI,Arial,sans-serif" text-anchor="middle">${rxTag}</text>
+      <g transform="translate(110,98) rotate(-22)">
+        <rect x="-26" y="-10" width="26" height="20" rx="10" fill="#f5fbf8" stroke="${palette.top}" stroke-width="2"/>
+        <rect x="0" y="-10" width="26" height="20" rx="10" fill="${palette.top}"/>
+      </g>
+      <rect x="20" y="145" width="180" height="40" rx="10" fill="#ffffff" opacity="0.96"/>
+      <text x="110" y="163" font-size="11" font-weight="700" fill="#152a21" font-family="Segoe UI,Arial,sans-serif" text-anchor="middle">${shortTitle}</text>
+      <text x="110" y="178" font-size="9.5" font-weight="600" fill="${palette.sub}" font-family="Segoe UI,Arial,sans-serif" text-anchor="middle">${donViTinh} · ${maSP}</text>
+    </svg>
+  `);
+}
+
+function recalcProductFromLots(p) {
+  if (!Array.isArray(p.lots) || !p.lots.length) {
+    p.lots = [{ soLo: 'LO-' + p.maSP, hanSuDung: '2027-12-31', soLuong: p.tonKho || 0, ngayNhap: '2026-10-01' }];
+  }
+  p.lots.sort((a, b) => String(a.hanSuDung).localeCompare(String(b.hanSuDung)));
+  p.tonKho = p.lots.reduce((sum, l) => sum + Number(l.soLuong || 0), 0);
+  p.hanSuDung = p.lots[0].hanSuDung;
+  p.loHienTai = p.lots[0].soLo;
+}
+
+function demoDb() {
+  if (DEMO.db) return DEMO.db;
+  const RX_CODES = new Set(['SP0004', 'SP0007']);
+  const SEED_LOTS = {
+    SP0001: [{ soLo: 'LO2601A', hanSuDung: '2027-08-15', soLuong: 80, ngayNhap: '2026-01-10' }, { soLo: 'LO2606A', hanSuDung: '2028-02-20', soLuong: 40, ngayNhap: '2026-06-05' }],
+    SP0004: [{ soLo: 'LO2602B', hanSuDung: '2026-12-20', soLuong: 8, ngayNhap: '2026-02-14' }],
+    SP0007: [{ soLo: 'LO2603C', hanSuDung: '2027-05-10', soLuong: 60, ngayNhap: '2026-03-12' }],
+    SP0002: [{ soLo: 'LO2601V', hanSuDung: '2028-01-30', soLuong: 45, ngayNhap: '2026-01-18' }],
+    SP0008: [{ soLo: 'LO2604O', hanSuDung: '2027-11-18', soLuong: 30, ngayNhap: '2026-04-22' }],
+    SP0006: [{ soLo: 'LO2602S', hanSuDung: '2027-09-25', soLuong: 20, ngayNhap: '2026-02-25' }],
+    SP0009: [{ soLo: 'LO2605K', hanSuDung: '2027-06-12', soLuong: 15, ngayNhap: '2026-05-08' }],
+    SP0003: [{ soLo: 'LO2601M', hanSuDung: '2029-03-01', soLuong: 300, ngayNhap: '2026-01-05' }],
+    SP0005: [{ soLo: 'LO2603N', hanSuDung: '2028-07-22', soLuong: 60, ngayNhap: '2026-03-19' }],
+    SP0010: [{ soLo: 'LO2602B2', hanSuDung: '2028-10-14', soLuong: 150, ngayNhap: '2026-02-11' }],
+    SP0011: [{ soLo: 'LO2604K2', hanSuDung: '2028-12-05', soLuong: 90, ngayNhap: '2026-04-03' }],
+    SP0012: [{ soLo: 'LO2601C2', hanSuDung: '2028-04-19', soLuong: 75, ngayNhap: '2026-01-27' }],
+    SP0013: [{ soLo: 'LO2602T1', hanSuDung: '2029-12-31', soLuong: 25, ngayNhap: '2026-02-09' }],
+    SP0014: [{ soLo: 'LO2601H1', hanSuDung: '2029-12-31', soLuong: 10, ngayNhap: '2026-01-15' }],
+    SP0015: [{ soLo: 'LO2603D1', hanSuDung: '2029-12-31', soLuong: 8, ngayNhap: '2026-03-21' }],
+    SP0016: [{ soLo: 'LO2605Q1', hanSuDung: '2027-07-08', soLuong: 50, ngayNhap: '2026-05-14' }],
+    SP0017: [{ soLo: 'LO2602G1', hanSuDung: '2028-09-01', soLuong: 40, ngayNhap: '2026-02-20' }],
+    SP0018: [{ soLo: 'LO2604N1', hanSuDung: '2029-12-31', soLuong: 12, ngayNhap: '2026-04-16' }]
+  };
+
+  const P = r => {
+    const a = r.split('|');
+    const keDon = RX_CODES.has(a[0]);
+    const prod = {
+      maSP: a[0], tenThuoc: a[1], donViTinh: a[2], giaBan: +a[3], tonKho: +a[4],
+      maDM: a[5], maNCC: a[6], keDon,
+      lots: JSON.parse(JSON.stringify(SEED_LOTS[a[0]] || [])),
+      hinhAnh: buildProductArt(a[0], a[1], a[2], a[5], keDon)
+    };
+    recalcProductFromLots(prod);
+    return prod;
+  };
+
+  DEMO.db = {
+    products: [
+      'SP0001|Paracetamol 500mg|Hộp|25000|120|DM01|NCC01',
+      'SP0004|Amoxicillin 500mg|Hộp|45000|8|DM01|NCC01',
+      'SP0007|Omeprazole 20mg|Hộp|85000|60|DM01|NCC02',
+      'SP0002|Vitamin C 1000mg|Lọ|180000|45|DM02|NCC02',
+      'SP0008|Omega 3 Fish Oil|Lọ|320000|30|DM02|NCC02',
+      'SP0006|Sữa rửa mặt Cetaphil|Lọ|250000|20|DM03|NCC02',
+      'SP0009|Kem chống nắng Anessa|Tuýp|450000|15|DM03|NCC02',
+      'SP0003|Khẩu trang y tế 4 lớp|Hộp|70000|300|DM04|NCC03',
+      'SP0005|Nước muối sinh lý 0.9%|Chai|15000|60|DM04|NCC03',
+      'SP0010|Bông y tế gói 100g|Gói|12000|150|DM04|NCC03',
+      'SP0011|Băng keo cá nhân (hộp 20)|Hộp|20000|90|DM04|NCC03',
+      'SP0012|Cồn sát khuẩn 70 độ 500ml|Chai|35000|75|DM04|NCC03',
+      'SP0013|Nhiệt kế điện tử|Cái|180000|25|DM04|NCC01',
+      'SP0014|Máy đo huyết áp Omron|Cái|850000|10|DM04|NCC01',
+      'SP0015|Máy đo đường huyết|Cái|650000|8|DM04|NCC01',
+      'SP0016|Que thử thai (hộp 2)|Hộp|40000|50|DM04|NCC02',
+      'SP0017|Găng tay y tế (hộp 100)|Hộp|85000|40|DM04|NCC03',
+      'SP0018|Ống nghe y tế|Cái|220000|12|DM04|NCC01'
+    ].map(P),
+    groups: [['DM01','Thuốc'],['DM02','TPCN'],['DM03','Mỹ phẩm'],['DM04','Dụng cụ y tế']],
+    perms: [
+      { maQuyen: 1, tenQuyen: 'Quản trị viên', moTa: 'Toàn quyền hệ thống' },
+      { maQuyen: 2, tenQuyen: 'Dược sĩ trưởng', moTa: 'Quản lý cửa hàng, kho, KH' },
+      { maQuyen: 3, tenQuyen: 'Dược sĩ', moTa: 'Bán hàng, KH, hàng hóa' },
+      { maQuyen: 4, tenQuyen: 'Khách hàng', moTa: 'Mua hàng online' },
+      { maQuyen: 5, tenQuyen: 'Nhà cung cấp', moTa: 'Xem đơn đặt hàng' }
+    ],
+    users: [
+      { maND: 'NV001', hoTen: 'Vũ Văn Huy', email: 'huy@hkcare.vn', trangThai: 'active', loai: 'admin' },
+      { maND: 'NV002', hoTen: 'Nguyễn Thị Lan', email: 'lan@hkcare.vn', trangThai: 'active', loai: 'duocsitruong' },
+      { maND: 'NV003', hoTen: 'Phạm Minh Dũng', email: 'dung@hkcare.vn', trangThai: 'active', loai: 'duocsi' }
+    ],
+    accounts: [
+      { maTK: 'TK001', tenDangNhap: 'huy', matKhau: '123456', maND: 'NV001', maQuyen: 1, trangThai: true },
+      { maTK: 'TK002', tenDangNhap: 'lan', matKhau: '123456', maND: 'NV002', maQuyen: 2, trangThai: true },
+      { maTK: 'TK003', tenDangNhap: 'dung', matKhau: '123456', maND: 'NV003', maQuyen: 3, trangThai: true },
+      { maTK: 'TK004', tenDangNhap: 'khachhang', matKhau: '123456', maND: 'KH0001', maQuyen: 4, trangThai: true },
+      { maTK: 'TK005', tenDangNhap: 'nhacungcap', matKhau: '123456', maND: 'NCC01', maQuyen: 5, trangThai: true }
+    ],
+    customers: [
+      { maKH: 'KH0001', hoTen: 'Nguyễn Văn A', sdt: '0912000001', gioiTinh: 'Nam', email: 'a@mail.com', diemTichLuy: 120 },
+      { maKH: 'KH0002', hoTen: 'Trần Thị B', sdt: '0987000002', gioiTinh: 'Nữ', email: 'b@mail.com', diemTichLuy: 45 }
+    ],
+    suppliers: [
+      { maNCC: 'NCC01', tenNCC: 'Cty Dược phẩm Minh Dược', maSoThue: '0101234567', diaChi: 'Hà Nội', sdt: '0243xxx', email: 'minhduoc@ncc.vn', congNo: 120000000 },
+      { maNCC: 'NCC02', tenNCC: 'Cty TNHH Sức khỏe Việt', maSoThue: '0101234568', diaChi: 'Hà Nội', sdt: '0243xxx', email: 'suckhoe@ncc.vn', congNo: 45000000 },
+      { maNCC: 'NCC03', tenNCC: 'Cty CP Dược TW Mediplantex', maSoThue: '0101234569', diaChi: 'Hà Nội', sdt: '0243xxx', email: 'medi@ncc.vn', congNo: 0 }
+    ],
+    promotions: [
+      { maKM: 'KM001', moTa: 'Mua 2 tặng 1 Paracetamol (Giảm 15% đơn ≥ 100k)', loaiKM: 'Giảm 15%', phanTram: 15, minOrder: 100000, trangThai: 'Đang chạy' },
+      { maKM: 'KM002', moTa: 'Giảm 10% Vitamin C & đơn hàng từ 150k', loaiKM: 'Giảm 10%', phanTram: 10, minOrder: 150000, trangThai: 'Đang chạy' }
+    ],
+    orders: [], invoices: [], payments: []
+  };
+  return DEMO.db;
+}
+
+function calcPromoDiscount(subtotal, promoCode) {
+  if (!promoCode || subtotal <= 0) return 0;
+  const km = demoDb().promotions.find(x => x.maKM === promoCode);
+  if (!km) return 0;
+  if (subtotal < (km.minOrder || 0)) return 0;
+  return Math.round(subtotal * (km.phanTram || 0) / 100);
+}
+
+function demoQr(id) {
+  return svgDataUrl(`<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260"><rect width="260" height="260" fill="#fcfffe"/><rect x="20" y="20" width="220" height="220" fill="none" stroke="#152a21" stroke-width="10" stroke-dasharray="26 8"/><text x="130" y="125" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="700" fill="#1d7d51">QR DEMO</text><text x="130" y="155" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#5f756b">${id}</text></svg>`);
+}
+
+function demoCall(path, opts = {}) {
+  const d = demoDb(), [p, qs] = path.split('?'), q = new URLSearchParams(qs || '');
+  const m = (opts.method || 'GET').toUpperCase();
+  const body = typeof opts.body === 'string' ? JSON.parse(opts.body) : {};
+  const E = msg => { throw new Error(msg); };
+  const out = data => ({ success: true, data });
+  const pad = (n, w) => String(n).padStart(w, '0');
+  const lc = v => (v || '').toLowerCase();
+  const find = (list, key, id, msg) => list.find(a => a[key] === id) || E(msg);
+  const sum = l => l.reduce((t, i) => t + i.donGia * i.soLuong, 0);
+  const authOf = t => {
+    const r = d.perms.find(a => a.maQuyen === t.maQuyen);
+    const who = t.maQuyen === 4 ? d.customers.find(a => a.maKH === t.maND) : t.maQuyen === 5 ? d.suppliers.find(a => a.maNCC === t.maND) : d.users.find(a => a.maND === t.maND);
+    return { token: 'demo-' + t.maTK, maND: t.maND, hoTen: who.hoTen || who.tenNCC, email: who.email || '', role: who.loai || 'User', maQuyen: t.maQuyen, tenQuyen: r.tenQuyen };
+  };
+  let x;
+  if (p === '/auth/login') {
+    const t = d.accounts.find(a => a.tenDangNhap === body.tenDangNhap) || E('Tên đăng nhập không tồn tại');
+    if (!t.trangThai) E('Tài khoản đã bị khóa');
+    if (t.matKhau !== body.matKhau) E('Mật khẩu không đúng');
+    return out(authOf(t));
+  }
+  if (p === '/auth/register') {
+    if (!body.tenDangNhap) E('Tên đăng nhập không được trống');
+    if (!body.matKhau || body.matKhau.length < 6) E('Mật khẩu phải ≥ 6 ký tự');
+    if (d.accounts.some(a => a.tenDangNhap === body.tenDangNhap)) E('Tên đăng nhập đã tồn tại');
+    const mq = body.maQuyen || 3; let maND;
+    if (mq === 4) { maND = 'KH' + pad(d.customers.length + 1, 4); d.customers.push({ maKH: maND, hoTen: body.hoTen, sdt: body.sdt || '', gioiTinh: '', email: body.email || '', diemTichLuy: 0 }); }
+    else if (mq === 5) { maND = 'NCC' + pad(d.suppliers.length + 1, 2); d.suppliers.push({ maNCC: maND, tenNCC: body.hoTen, maSoThue: '', diaChi: '', sdt: body.sdt || '', email: body.email || '', congNo: 0 }); }
+    else { maND = 'NV' + pad(d.users.length + 1, 3); d.users.push({ maND, hoTen: body.hoTen, email: body.email, trangThai: 'active', loai: { 1: 'admin', 2: 'duocsitruong', 3: 'duocsi' }[mq] }); }
+    const t = { maTK: 'TK' + pad(d.accounts.length + 1, 3), tenDangNhap: body.tenDangNhap, matKhau: body.matKhau, maND, maQuyen: mq, trangThai: true };
+    d.accounts.push(t); return out(authOf(t));
+  }
+  if (p === '/auth/me') return out(authOf(find(d.accounts, 'maTK', (CURRENT_TOKEN || '').replace('demo-', ''), 'Phiên đăng nhập hết hạn')));
+  if (p === '/auth/logout') return out(null);
+  if (p === '/auth/permissions') return out(d.perms);
+  if (p === '/auth/accounts') return out(d.accounts.map(({ matKhau, ...t }) => t));
+  if (x = p.match(/^\/auth\/accounts\/(\w+)\/(role|status)$/)) {
+    const t = find(d.accounts, 'maTK', x[1], 'Không tìm thấy tài khoản');
+    if (x[2] === 'role') t.maQuyen = body.maQuyen; else t.trangThai = body.trangThai;
+    return out(null);
+  }
+  if (p === '/products') {
+    const s = lc(q.get('q')), g = q.get('group'), rx = q.get('rx');
+    return out(d.products.filter(a => {
+      const matchLot = (a.lots || []).some(l => lc(l.soLo).includes(s) || lc(l.hanSuDung).includes(s));
+      const matchText = !s || lc(a.tenThuoc).includes(s) || lc(a.maSP).includes(s) || matchLot;
+      const matchGroup = !g || a.maDM === g;
+      const matchRx = !rx || (rx === 'RX' ? !!a.keDon : !a.keDon);
+      return matchText && matchGroup && matchRx;
+    }));
+  }
+  if (p === '/products/groups') return out(d.groups.map(([ma, ten]) => {
+    const l = d.products.filter(a => a.maDM === ma);
+    return { group: ten, maDM: ma, count: l.length, totalStock: l.reduce((t, a) => t + a.tonKho, 0), totalValue: l.reduce((t, a) => t + a.giaBan * a.tonKho, 0), lowStock: l.filter(a => a.tonKho < 20).length };
+  }));
+  if (p === '/customers' && m === 'GET') {
+    const s = lc(q.get('q')), ph = q.get('phone');
+    return out(d.customers.filter(c => (!ph || c.sdt.includes(ph)) && (!s || lc(c.hoTen).includes(s) || c.sdt.includes(s) || lc(c.maKH).includes(s) || lc(c.email).includes(s))));
+  }
+  if (p === '/customers' && m === 'POST') {
+    if (!body.hoTen) E('Họ tên không được trống'); if (!body.sdt) E('SĐT không được trống');
+    if (d.customers.some(c => c.sdt === body.sdt)) E('SĐT đã tồn tại');
+    const c = { ...body, maKH: 'KH' + pad(d.customers.length + 1, 4), diemTichLuy: 0 }; d.customers.push(c); return out(c);
+  }
+  if (x = p.match(/^\/customers\/(\w+)(\/history)?$/)) {
+    const c = find(d.customers, 'maKH', x[1], 'Không tìm thấy khách hàng');
+    if (x[2]) return out(d.invoices.filter(h => h.maKH === c.maKH));
+    if (m === 'PUT') { if (body.sdt && body.sdt !== c.sdt && d.customers.some(k => k.sdt === body.sdt)) E('SĐT đã tồn tại'); ['hoTen','sdt','gioiTinh','email'].forEach(k => { if (body[k]) c[k] = body[k]; }); }
+    if (m === 'DELETE') { const n = d.invoices.filter(h => h.maKH === c.maKH).length; if (n) E('Không thể xóa: KH có ' + n + ' hóa đơn'); d.customers.splice(d.customers.indexOf(c), 1); return out(null); }
+    return out(c);
+  }
+  if (p === '/suppliers' && m === 'GET') {
+    const s = lc(q.get('q'));
+    return out(d.suppliers.filter(a => !s || lc(a.tenNCC).includes(s) || lc(a.maNCC).includes(s) || (a.sdt || '').includes(s) || lc(a.email).includes(s)));
+  }
+  if (p === '/suppliers' && m === 'POST') {
+    if (!body.tenNCC) E('Tên NCC không được trống');
+    const a = { ...body, maNCC: 'NCC' + pad(d.suppliers.length + 1, 2), congNo: 0 }; d.suppliers.push(a); return out(a);
+  }
+  if (x = p.match(/^\/suppliers\/(\w+)(\/history)?$/)) {
+    const a = find(d.suppliers, 'maNCC', x[1], 'Không tìm thấy NCC');
+    if (x[2]) return out([]);
+    if (m === 'PUT') ['tenNCC','maSoThue','diaChi','sdt','email','ghiChu'].forEach(k => { if (body[k]) a[k] = body[k]; });
+    if (m === 'DELETE') { const n = d.products.filter(s => s.maNCC === a.maNCC).length; if (n) E('Không thể xóa: NCC đang cung cấp ' + n + ' sản phẩm'); d.suppliers.splice(d.suppliers.indexOf(a), 1); return out(null); }
+    return out(a);
+  }
+  if (p === '/users') return out(d.users);
+  if (p === '/promotions') return out(d.promotions);
+  if (p === '/orders' && m === 'GET') return out(d.orders);
+  if (p === '/orders' && m === 'POST') {
+    if (!body.chiTiet || !body.chiTiet.length) E('Đơn hàng rỗng');
+    const sub = sum(body.chiTiet);
+    const disc = body.giamGia != null ? body.giamGia : calcPromoDiscount(sub, body.maKM);
+    const total = Math.max(0, sub - disc);
+    const o = { ...body, maDon: 'ONL' + pad(d.orders.length + 1, 4), tamTinh: sub, giamGia: disc, thanhTien: total, trangThai: 'Chờ xác nhận', ngayDat: new Date().toISOString() };
+    d.orders.push(o); return out(o);
+  }
+  if (x = p.match(/^\/orders\/(\w+)\/status$/)) { find(d.orders, 'maDon', x[1], 'Không tìm thấy đơn').trangThai = body.status; return out(null); }
+  if (p === '/invoices' && m === 'POST') {
+    if (!body.chiTiet || !body.chiTiet.length) E('Hóa đơn rỗng');
+    const sub = sum(body.chiTiet);
+    const disc = body.giamGia != null ? body.giamGia : calcPromoDiscount(sub, body.maKM);
+    const total = Math.max(0, sub - disc);
+    const h = { ...body, maHD: 'HD' + pad(d.invoices.length + 1, 4), tamTinh: sub, giamGia: disc, tongTien: total, trangThai: 'Hoàn tất', ngayLap: new Date().toISOString() };
+    d.invoices.push(h); return out(h);
+  }
+  if (p === '/payments' && m === 'POST') {
+    const bank = { bankName: 'Vietcombank', accountNo: '0123456789', accountName: 'HKCARE PHARMACY' };
+    const pay = { id: 'PAY' + Math.random().toString(36).slice(2, 10).toUpperCase(), method: body.method, amount: body.amount, status: body.method === 'cash' ? 'paid' : 'pending', createdAt: new Date().toISOString() };
+    if (body.method === 'qr') { pay.bankInfo = bank; pay.qrFallback = demoQr(pay.id); }
+    if (body.method === 'bank') pay.bankInfo = { ...bank, content: pay.id };
+    d.payments.push(pay); return out(pay);
+  }
+  if (x = p.match(/^\/payments\/(\w+)\/confirm$/)) { find(d.payments, 'id', x[1], 'Không tìm thấy giao dịch').status = 'paid'; return out(null); }
+  if (p === '/stats/dashboard') return out({
+    totalProducts: d.products.length, totalCustomers: d.customers.length, totalSuppliers: d.suppliers.length,
+    totalOrders: d.orders.length, totalInvoices: d.invoices.length,
+    todayRevenue: d.payments.filter(a => a.status === 'paid').reduce((t, a) => t + a.amount, 0),
+    lowStockProducts: d.products.filter(a => a.tonKho < 20).length
+  });
+  if (p === '/image-search') return out({
+    results: d.products.map(a => ({ maSP: a.maSP, tenThuoc: a.tenThuoc, maDM: a.maDM, giaBan: a.giaBan, hinhAnh: a.hinhAnh, keDon: a.keDon, score: 86 + Math.floor(Math.random() * 14) }))
+      .sort((a, b) => b.score - a.score).slice(0, 4)
+  });
+  E('Không tìm thấy: ' + p);
+}
+
+async function api(path, opts = {}) {
+  return demoCall(path, opts);
+}
+
+const fmt = n => (n || 0).toLocaleString('vi-VN') + 'đ';
+const wrap = (head, rows, foot) => `<div class="tbl-wrap"><table class="data"><thead><tr>${head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table>${foot ? `<div class="tbl-foot">${foot}</div>` : ''}</div>`;
+const emptyRow = (n, t) => `<tr><td colspan="${n}" style="text-align:center;color:var(--mute);padding:26px">${t}</td></tr>`;
+
+const EMO = { DM01: '💊', DM02: '🌿', DM03: '🧴', DM04: '🩺' };
+const thumb = (p, size) => {
+  const src = p.hinhAnh || buildProductArt(p.maSP, p.tenThuoc, p.donViTinh || 'Hộp', p.maDM, p.keDon);
+  return `<span class="th ${size}">${EMO[p.maDM] || '📦'}${src ? `<img src="${src}" alt="${p.tenThuoc}" loading="lazy" onerror="this.remove()">` : ''}</span>`;
+};
+const rxBadge = p => p.keDon
+  ? `<span class="badge rx">🩺 Kê đơn (Rx)</span>`
+  : `<span class="badge otc">✓ Không kê đơn</span>`;
+
+let toastTimer;
+function toast(msg, isErr) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show' + (isErr ? ' err' : '');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.className = '', 2600);
+}
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) {
+  if (id === 'modal-imgsearch') stopCamera();
+  document.getElementById(id).classList.remove('show');
+}
+document.querySelectorAll('.modal-overlay').forEach(m => m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); }));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.show').forEach(m => closeModal(m.id)); });
+
+/* AUTH */
+function switchAuthTab(tab, btn) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active')); btn.classList.add('active');
+  document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
+  ['login-error', 'register-error'].forEach(i => document.getElementById(i).classList.add('hidden'));
+}
+async function authSubmit(path, body, btnId, errId, label, okMsg) {
+  const btn = document.getElementById(btnId), err = document.getElementById(errId);
+  err.classList.add('hidden'); btn.disabled = true; btn.textContent = 'Đang xử lý…';
+  try {
+    const { data } = await api(path, { method: 'POST', body: JSON.stringify(body) });
+    CURRENT_TOKEN = data.token; CURRENT_USER = data;
+    localStorage.setItem('hkcare_token', data.token);
+    showApp(); toast(okMsg(data));
+  } catch (e) {
+    err.textContent = e.message;
+    err.classList.remove('hidden');
+  } finally { btn.disabled = false; btn.textContent = label; }
+}
+function handleLogin(e) {
+  e.preventDefault();
+  authSubmit('/auth/login', { tenDangNhap: document.getElementById('login-username').value.trim(), matKhau: document.getElementById('login-password').value },
+    'login-btn', 'login-error', 'Đăng nhập', d => `Xin chào ${d.hoTen} (${d.tenQuyen})`);
+}
+function handleRegister(e) {
+  e.preventDefault();
+  const v = id => document.getElementById(id).value.trim();
+  authSubmit('/auth/register', { hoTen: v('reg-hoten'), tenDangNhap: v('reg-username'), matKhau: document.getElementById('reg-password').value,
+    email: v('reg-email'), sdt: v('reg-sdt'), maQuyen: Number(document.getElementById('reg-role').value) },
+    'register-btn', 'register-error', 'Đăng ký', d => `Đăng ký thành công. Chào ${d.hoTen}`);
+}
+async function handleLogout() {
+  try { if (CURRENT_TOKEN) await api('/auth/logout', { method: 'POST' }); } catch (_) {}
+  CURRENT_TOKEN = null; CURRENT_USER = null; localStorage.removeItem('hkcare_token');
+  showAuthScreen(); toast('Đã đăng xuất');
+}
+function showAuthScreen() {
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('app').classList.add('hidden');
+}
+function showApp() {
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('sidebar-name').textContent = CURRENT_USER.hoTen;
+  document.getElementById('sidebar-role').textContent = CURRENT_USER.tenQuyen;
+  applyPermissions(); navigateTo('dashboard');
+}
+const MENU_ROLES = { dashboard:[1,2,3,4,5], uc01:[1], uc02:[1,2,3,4], uc03:[1,2,5], uc04a:[1,2,3], uc04b:[1,2,3,4], uc05:[1,2,3], uc06:[1], uc07:[1,2] };
+function applyPermissions() {
+  document.querySelectorAll('#menu a').forEach(a => a.style.display = MENU_ROLES[a.dataset.page].includes(CURRENT_USER.maQuyen) ? '' : 'none');
+}
+async function restoreSession() {
+  if (!CURRENT_TOKEN) return showAuthScreen();
+  try { const { data } = await api('/auth/me'); CURRENT_USER = data; showApp(); }
+  catch (e) { showAuthScreen(); }
+}
+
+/* NAV */
+document.querySelectorAll('#menu a').forEach(link => link.addEventListener('click', () => navigateTo(link.dataset.page)));
+function navigateTo(page) {
+  document.querySelectorAll('#menu a').forEach(a => a.classList.toggle('active', a.dataset.page === page));
+  document.querySelectorAll('main > section').forEach(p => p.classList.add('hidden'));
+  document.getElementById('page-' + page).classList.remove('hidden');
+  routeLoad(page);
+}
+function routeLoad(page) {
+  if (page === 'dashboard') loadDashboard();
+  if (page === 'uc01') loadAccounts();
+  if (page === 'uc02') { loadGroupStats(); loadProducts(); }
+  if (page === 'uc03') loadPurchaseOrders();
+  if (page === 'uc04a') { populatePromoSelect('pos-promo'); loadPosProducts(); }
+  if (page === 'uc04b') { populatePromoSelect('online-promo'); initOnlineCustomer(); loadOnlineProducts(); loadOrders(); }
+  if (page === 'uc05') loadCustomers();
+  if (page === 'uc06') loadUsers('users-table2');
+  if (page === 'uc07') loadSuppliers();
+}
+
+function populatePromoSelect(selectId) {
+  const sel = document.getElementById(selectId);
+  const prev = sel.value;
+  const active = demoDb().promotions.filter(k => k.trangThai === 'Đang chạy');
+  sel.innerHTML = `<option value="">— Không áp dụng khuyến mãi —</option>` +
+    active.map(k => `<option value="${k.maKM}">${k.maKM} · ${k.moTa}</option>`).join('');
+  if (prev && [...sel.options].some(o => o.value === prev)) sel.value = prev;
+}
+
+async function loadDashboard() {
+  try {
+    const { data: d } = await api('/stats/dashboard');
+    const cards = [
+      ['📦', d.totalProducts, 'Sản phẩm'],
+      ['👥', d.totalCustomers, 'Khách hàng'],
+      ['🏭', d.totalSuppliers, 'Nhà cung cấp'],
+      ['🚚', d.totalOrders, 'Đơn Online'],
+      ['🧾', d.totalInvoices, 'Hóa đơn'],
+      ['💰', fmt(d.todayRevenue), 'Doanh thu hôm nay'],
+      ['⚠️', d.lowStockProducts, 'Sản phẩm sắp hết']
+    ];
+    document.getElementById('dashboard-stats').innerHTML = cards.map(c => `<div class="stat-card" style="cursor:default"><div class="ico">${c[0]}</div><div><div class="num">${c[1]}</div><div class="lbl">${c[2]}</div></div></div>`).join('');
+    document.getElementById('welcome-msg').textContent = `Xin chào ${CURRENT_USER.hoTen} · ${CURRENT_USER.tenQuyen}`;
+    const { data: prods } = await api('/products');
+    document.getElementById('dashboard-products').innerHTML = `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="margin:0">📦 Sản phẩm hiện có (${prods.length})</h3><button class="btn btn-outline btn-sm" onclick="navigateTo('uc02')">Xem tất cả →</button></div>`
+      + wrap(['Ảnh','Mã SP','Tên','Loại kê đơn','HSD lô gần nhất','Giá bán'], prods.slice(0, 5).map(p => `<tr><td>${thumb(p, 'sm')}</td><td class="muted">${p.maSP}</td><td><b>${p.tenThuoc}</b></td><td>${rxBadge(p)}</td><td><span class="badge info">${p.hanSuDung}</span> <span class="muted">(${p.loHienTai})</span></td><td>${fmt(p.giaBan)}</td></tr>`).join('')) + '</div>';
+  } catch (e) { toast(e.message, true); }
+}
+
+/* UC03 */
+const PO_DATA = [
+  { ma: 'PO20260501', ncc: 'NCC01', ten: 'Cty Dược phẩm Minh Dược', ngay: '01/05/2026', tt: 'Chờ duyệt' },
+  { ma: 'PO20260502', ncc: 'NCC02', ten: 'Cty TNHH Sức khỏe Việt', ngay: '02/05/2026', tt: 'Đã duyệt' }
+];
+function loadPurchaseOrders() {
+  const list = CURRENT_USER.maQuyen === 5 ? PO_DATA.filter(p => p.ncc === CURRENT_USER.maND) : PO_DATA;
+  document.getElementById('po-table').innerHTML = wrap(['Mã PO','Nhà cung cấp','Ngày đặt','Trạng thái'],
+    list.map(p => `<tr><td><b>${p.ma}</b></td><td>${p.ten}</td><td>${p.ngay}</td><td><span class="badge ${p.tt === 'Đã duyệt' ? 'active' : 'pending'}">${p.tt}</span></td></tr>`).join('') || emptyRow(4, 'Chưa có đơn đặt hàng'));
+}
+
+/* UC02 - HÀNG HÓA, KÊ ĐƠN & HẠN SỬ DỤNG THEO LÔ */
+const dmColors = {DM01:'background:#e2f5ea;color:#1b7a4e',DM02:'background:#fdf2d6;color:#8f6106',DM03:'background:#fce8f2;color:#9d245e',DM04:'background:#e5f1fc;color:#2468a8'};
+const dmNames = {DM01:'Thuốc',DM02:'TPCN',DM03:'Mỹ phẩm',DM04:'Dụng cụ y tế'};
+
+function formatLotsCell(p) {
+  const lots = p.lots || [];
+  const lotBadges = lots.map(l => `<div style="margin-bottom:3px"><span class="badge info">Lô ${l.soLo}</span> · HSD: <b>${l.hanSuDung}</b> <span class="muted">(${l.soLuong})</span></div>`).join('');
+  return `<div>${lotBadges}<button type="button" class="btn btn-outline btn-sm" style="margin-top:4px" onclick="openLotModal('${p.maSP}')">+ Thêm lô / HSD</button></div>`;
+}
+
+async function loadProducts() {
+  try {
+    const q = document.getElementById('search-q').value;
+    const g = document.getElementById('search-group').value;
+    const rx = document.getElementById('search-rx').value;
+    const { data } = await api(`/products?q=${encodeURIComponent(q)}&group=${encodeURIComponent(g)}&rx=${encodeURIComponent(rx)}`);
+    document.getElementById('products-table').innerHTML = wrap(
+      ['Ảnh','Mã SP','Tên & Phân loại','Nhóm','Lô nhập & Hạn sử dụng','Giá','Tồn kho'],
+      data.map(p => `<tr>
+        <td>${thumb(p, 'sm')}</td>
+        <td class="muted">${p.maSP}</td>
+        <td><b>${p.tenThuoc}</b><div style="margin-top:4px">${rxBadge(p)}</div></td>
+        <td><span class="badge" style="${dmColors[p.maDM] || ''}">${dmNames[p.maDM] || p.maDM}</span></td>
+        <td>${formatLotsCell(p)}</td>
+        <td>${fmt(p.giaBan)}</td>
+        <td>${p.tonKho < 20 ? `<span class="badge" style="background:var(--red-l);color:var(--red)">${p.tonKho} · sắp hết</span>` : `<b>${p.tonKho}</b>`}</td>
+      </tr>`).join('') || emptyRow(7, 'Không có sản phẩm phù hợp'),
+      `Tổng: ${data.length} mặt hàng · Quản lý HSD theo từng lô nhập`
+    );
+  } catch (e) { document.getElementById('products-table').innerHTML = `<div class="alert warn">${e.message}</div>`; toast(e.message, true); }
+}
+
+async function loadGroupStats() {
+  try {
+    const { data } = await api('/products/groups');
+    const icons = {DM01:'💊',DM02:'🌿',DM03:'🧴',DM04:'🩺'};
+    document.getElementById('group-stats').innerHTML = data.map(g => `
+      <div class="stat-card" onclick="document.getElementById('search-group').value='${g.maDM}';loadProducts()">
+        <div class="ico">${icons[g.maDM]||'📦'}</div>
+        <div><div class="num">${g.count}</div><div class="lbl">${g.group} · Tồn ${g.totalStock}</div>
+        <div class="lbl">${fmt(g.totalValue)}</div>
+        ${g.lowStock ? `<div class="sub">⚠ ${g.lowStock} SP sắp hết</div>` : ''}</div>
+      </div>`).join('');
+  } catch (e) { console.error(e); }
+}
+
+let pendingLotImageDataUrl = '';
+function openLotModal(maSP) {
+  const prods = demoDb().products;
+  const sel = document.getElementById('lot-product');
+  sel.innerHTML = prods.map(p => `<option value="${p.maSP}">${p.maSP} — ${p.tenThuoc} (${p.keDon ? 'Kê đơn' : 'Không kê đơn'})</option>`).join('');
+  if (maSP) sel.value = maSP;
+  document.getElementById('lot-code').value = '';
+  document.getElementById('lot-expiry').value = '2027-12-31';
+  document.getElementById('lot-qty').value = '20';
+  document.getElementById('lot-image-file').value = '';
+  pendingLotImageDataUrl = '';
+  const prev = document.getElementById('lot-img-preview');
+  prev.classList.add('hidden');
+  document.getElementById('lot-error').classList.add('hidden');
+  renderLotHistoryInModal();
+  openModal('modal-lot');
+}
+
+function previewProductImageFile(event) {
+  const f = event.target.files?.[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    pendingLotImageDataUrl = e.target.result;
+    const img = document.getElementById('lot-img-preview');
+    img.src = pendingLotImageDataUrl;
+    img.classList.remove('hidden');
+  };
+  reader.readAsDataURL(f);
+}
+
+function renderLotHistoryInModal() {
+  const maSP = document.getElementById('lot-product').value;
+  const p = demoDb().products.find(x => x.maSP === maSP);
+  if (!p) return;
+  const rows = (p.lots || []).map((l, idx) => `<tr>
+    <td><b>${l.soLo}</b></td>
+    <td>${l.hanSuDung}</td>
+    <td>${l.soLuong}</td>
+    <td>${l.ngayNhap || '—'}</td>
+    <td><button type="button" class="btn btn-outline btn-sm" onclick="fillLotForEdit(${idx})">Sửa HSD/SL</button></td>
+  </tr>`).join('');
+  document.getElementById('lot-existing-list').innerHTML = wrap(['Số lô','Hạn sử dụng','Số lượng','Ngày nhập','Thao tác'], rows || emptyRow(5, 'Chưa có lô'));
+}
+
+function fillLotForEdit(idx) {
+  const maSP = document.getElementById('lot-product').value;
+  const p = demoDb().products.find(x => x.maSP === maSP);
+  const lot = p?.lots?.[idx];
+  if (!lot) return;
+  document.getElementById('lot-code').value = lot.soLo;
+  document.getElementById('lot-expiry').value = lot.hanSuDung;
+  document.getElementById('lot-qty').value = lot.soLuong;
+}
+
+function saveLotEntry() {
+  const maSP = document.getElementById('lot-product').value;
+  const soLo = document.getElementById('lot-code').value.trim();
+  const hanSuDung = document.getElementById('lot-expiry').value;
+  const soLuong = Number(document.getElementById('lot-qty').value);
+  const errEl = document.getElementById('lot-error');
+  const p = demoDb().products.find(x => x.maSP === maSP);
+  if (!p) return;
+
+  if (!soLo && !pendingLotImageDataUrl) {
+    errEl.textContent = 'Vui lòng nhập số lô hoặc chọn ảnh sản phẩm';
+    errEl.classList.remove('hidden');
+    return;
+  }
+  if (soLo) {
+    if (!hanSuDung) {
+      errEl.textContent = 'Vui lòng chọn hạn sử dụng cho lô nhập';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    if (!soLuong || soLuong <= 0) {
+      errEl.textContent = 'Số lượng lô phải lớn hơn 0';
+      errEl.classList.remove('hidden');
+      return;
+    }
+    const existing = p.lots.find(l => l.soLo.toLowerCase() === soLo.toLowerCase());
+    if (existing) {
+      existing.hanSuDung = hanSuDung;
+      existing.soLuong = soLuong;
+    } else {
+      p.lots.push({ soLo, hanSuDung, soLuong, ngayNhap: new Date().toISOString().slice(0, 10) });
+    }
+    recalcProductFromLots(p);
+  }
+  if (pendingLotImageDataUrl) {
+    p.hinhAnh = pendingLotImageDataUrl;
+  }
+  errEl.classList.add('hidden');
+  closeModal('modal-lot');
+  loadGroupStats();
+  loadProducts();
+  toast(`Đã lưu dữ liệu lô & hạn sử dụng cho ${p.tenThuoc} (không làm mất dữ liệu cũ)`);
+}
+
+/* UC02 - IMAGE SEARCH */
+let selectedImageFile = null;
+function openImageSearch() { resetImageSearch(); openModal('modal-imgsearch'); }
+let camStream = null;
+async function openCamera() {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    toast('Trình duyệt không hỗ trợ camera, hãy chọn ảnh từ thư viện', true);
+    return document.getElementById('file-input').click();
+  }
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 } }, audio: false });
+    document.getElementById('cam-video').srcObject = camStream;
+    document.getElementById('img-source').classList.add('hidden');
+    document.getElementById('img-cancel').classList.add('hidden');
+    document.getElementById('cam-area').classList.remove('hidden');
+  } catch (e) {
+    toast('Không mở được camera. Hãy cho phép quyền camera hoặc chọn ảnh từ thư viện', true);
+  }
+}
+function stopCamera() {
+  camStream?.getTracks().forEach(t => t.stop()); camStream = null;
+  document.getElementById('cam-video').srcObject = null;
+  document.getElementById('cam-area').classList.add('hidden');
+}
+function capturePhoto() {
+  const v = document.getElementById('cam-video');
+  if (!v.videoWidth) return toast('Camera chưa sẵn sàng', true);
+  const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
+  c.getContext('2d').drawImage(v, 0, 0);
+  c.toBlob(b => { stopCamera(); setImage(new File([b], 'capture-' + Date.now() + '.jpg', { type: 'image/jpeg' })); }, 'image/jpeg', .9);
+}
+function handleFile(event) {
+  const f = event.target.files?.[0]; if (!f) return;
+  setImage(f); event.target.value = '';
+}
+function setImage(file) {
+  selectedImageFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('img-preview').src = e.target.result;
+    document.getElementById('img-source').classList.add('hidden');
+    document.getElementById('img-cancel').classList.add('hidden');
+    document.getElementById('img-preview-area').classList.remove('hidden');
+    document.getElementById('img-results').classList.add('hidden');
+  };
+  reader.readAsDataURL(file);
+}
+function pickResult(ma) {
+  closeModal('modal-imgsearch');
+  document.getElementById('search-q').value = ma; loadProducts();
+  toast('Đã chọn sản phẩm ' + ma);
+}
+async function searchByImage() {
+  if (!selectedImageFile) return toast('Chưa chọn ảnh', true);
+  const btn = document.getElementById('btn-search-img');
+  btn.textContent = '⏳ Đang tìm…'; btn.disabled = true;
+  try {
+    const form = new FormData(); form.append('image', selectedImageFile);
+    const data = await api('/image-search', { method: 'POST', body: form });
+    document.getElementById('result-count').textContent = data.data.results.length;
+    document.getElementById('results-list').innerHTML = data.data.results.map(r => `
+      <div class="result-item" onclick="pickResult('${r.maSP}')">
+        ${thumb(r, 'lg')}
+        <div class="meta"><b>${r.tenThuoc}</b><small>Mã: ${r.maSP} · ${r.keDon ? 'Kê đơn' : 'Không kê đơn'} · ${fmt(r.giaBan)}</small></div>
+        <span class="score">${r.score}% khớp</span></div>`).join('');
+    document.getElementById('img-preview-area').classList.add('hidden');
+    document.getElementById('img-results').classList.remove('hidden');
+  } catch (e) { toast(e.message, true); }
+  finally { btn.textContent = '🔍 Tìm'; btn.disabled = false; }
+}
+function resetImageSearch() {
+  stopCamera();
+  document.getElementById('img-source').classList.remove('hidden');
+  document.getElementById('img-cancel').classList.remove('hidden');
+  document.getElementById('img-preview-area').classList.add('hidden');
+  document.getElementById('img-results').classList.add('hidden');
+  selectedImageFile = null;
+}
+
+const productCard = (p, fn, extra) => `<div class="product-card" onclick="${fn}('${p.maSP}')">
+  ${thumb(p, 'md')}
+  <h4>${p.tenThuoc}</h4>
+  <div style="margin:3px 0">${rxBadge(p)}</div>
+  <p>${extra}</p>
+  <p class="price">${fmt(p.giaBan)}</p>
+</div>`;
+
+const cartRows = (cart, chg, rm) => cart.map((i, idx) => `<tr>
+  <td><b>${i.tenThuoc}</b>${i.keDon ? ' <span class="badge rx">Rx</span>' : ''}</td>
+  <td style="white-space:nowrap"><button class="btn btn-outline btn-sm" onclick="${chg}(${idx},-1)">−</button> <b>${i.qty}</b> <button class="btn btn-outline btn-sm" onclick="${chg}(${idx},1)">+</button></td>
+  <td>${fmt(i.giaBan * i.qty)}</td>
+  <td><button class="btn btn-danger btn-sm" onclick="${rm}(${idx})" aria-label="Xóa">✕</button></td>
+</tr>`).join('') || emptyRow(4, 'Chưa có sản phẩm');
+
+function hasPrescriptionInCart(cartList) {
+  return cartList.some(item => !!item.keDon);
+}
+
+/* UC04.1 POS */
+let allProducts = [], cart = [], payMethod = 'cash';
+async function loadPosProducts() {
+  try { const { data } = await api('/products'); allProducts = data; renderPosProducts(); renderCart(); }
+  catch (e) { toast(e.message, true); }
+}
+function renderPosProducts() {
+  const q = (document.getElementById('pos-search').value || '').toLowerCase();
+  const list = q ? allProducts.filter(p => p.tenThuoc.toLowerCase().includes(q) || p.maSP.toLowerCase().includes(q)) : allProducts;
+  document.getElementById('pos-products').innerHTML = list.map(p => productCard(p, 'addToCart', `${dmNames[p.maDM]||p.maDM} · Tồn: ${p.tonKho} · HSD: ${p.hanSuDung}`)).join('') || '<div class="muted">Không có sản phẩm</div>';
+}
+function addToCart(ma) {
+  const p = allProducts.find(x => x.maSP === ma); if (!p) return;
+  const f = cart.find(i => i.maSP === ma);
+  if (f) f.qty++; else cart.push({ maSP: ma, tenThuoc: p.tenThuoc, giaBan: p.giaBan, qty: 1, keDon: !!p.keDon });
+  renderCart();
+}
+function renderCart() {
+  document.getElementById('cart-body').innerHTML = cartRows(cart, 'changeQty', 'removeItem');
+  const sub = cart.reduce((s, i) => s + i.giaBan * i.qty, 0);
+  const promoCode = document.getElementById('pos-promo').value;
+  const disc = calcPromoDiscount(sub, promoCode);
+  document.getElementById('pos-subtotal').textContent = fmt(sub);
+  document.getElementById('pos-discount').textContent = '-' + fmt(disc);
+  document.getElementById('grandtotal').textContent = fmt(Math.max(0, sub - disc));
+  document.getElementById('pos-rx-box').classList.toggle('hidden', !hasPrescriptionInCart(cart));
+}
+function changeQty(idx, d) { cart[idx].qty += d; if (cart[idx].qty <= 0) cart.splice(idx, 1); renderCart(); }
+function removeItem(idx) { cart.splice(idx, 1); renderCart(); }
+function selectPayMethod(m) {
+  payMethod = m;
+  document.querySelectorAll('#page-uc04a .pay-method').forEach(el => el.classList.toggle('selected', el.dataset.method === m));
+}
+async function checkoutPOS() {
+  if (!cart.length) return toast('Giỏ trống', true);
+  if (hasPrescriptionInCart(cart)) {
+    const rxCode = document.getElementById('pos-rx-code').value.trim();
+    const rxDoc = document.getElementById('pos-rx-doctor').value.trim();
+    if (!rxCode || !rxDoc) {
+      return toast('Giỏ hàng có thuốc kê đơn: vui lòng nhập mã đơn thuốc và bác sĩ kê đơn Offline', true);
+    }
+  }
+  const sub = cart.reduce((s, i) => s + i.giaBan * i.qty, 0);
+  const promoCode = document.getElementById('pos-promo').value;
+  const disc = calcPromoDiscount(sub, promoCode);
+  const total = Math.max(0, sub - disc);
+  const donThuocOff = hasPrescriptionInCart(cart) ? {
+    maDonThuoc: document.getElementById('pos-rx-code').value.trim(),
+    bacSi: document.getElementById('pos-rx-doctor').value.trim(),
+    nguoiBenh: document.getElementById('pos-rx-patient').value.trim()
+  } : null;
+
+  try {
+    const { data: payment } = await api('/payments', { method: 'POST', body: JSON.stringify({ method: payMethod, amount: total, orderInfo: 'POS' }) });
+    await api('/invoices', { method: 'POST', body: JSON.stringify({
+      maNV: CURRENT_USER.maND, maKH: 'KH0001', hinhThucThanhToan: payMethod,
+      maKM: promoCode, giamGia: disc, donThuocOffline: donThuocOff,
+      chiTiet: cart.map(i => ({ maSP: i.maSP, soLuong: i.qty, donGia: i.giaBan, thanhTien: i.giaBan * i.qty }))
+    })});
+    showPaymentModal(payment, 'Hóa đơn Offline', disc, promoCode);
+    cart = [];
+    document.getElementById('pos-rx-code').value = '';
+    document.getElementById('pos-rx-doctor').value = '';
+    document.getElementById('pos-rx-patient').value = '';
+    renderCart();
+  } catch (e) { toast(e.message, true); }
+}
+
+function showPaymentModal(payment, title, disc = 0, promoCode = '') {
+  const bank = b => `<div class="bank-info">
+    <div><span>Ngân hàng</span><b>${b.bankName}</b></div><div><span>Số tài khoản</span><b>${b.accountNo}</b></div>
+    <div><span>Chủ tài khoản</span><b>${b.accountName}</b></div>${b.content ? `<div><span>Nội dung</span><b>${b.content}</b></div>` : ''}</div>`;
+  const actions = `<div class="form-actions"><button class="btn btn-outline" onclick="closeModal('modal-payment')">Đóng</button>
+    <button class="btn btn-success" onclick="confirmPayment('${payment.id}')">✅ Xác nhận</button></div>`;
+  const promoNote = disc > 0 ? `<div class="alert info">🎁 Đã áp dụng khuyến mãi ${promoCode}: giảm <b>${fmt(disc)}</b></div>` : '';
+  let html = `<h2>${title}</h2>${promoNote}`;
+  if (payment.method === 'cash') {
+    html += `<div class="alert ok">✅ Đã thanh toán ${fmt(payment.amount)}</div>
+      <div class="form-actions"><button class="btn btn-primary" onclick="closeModal('modal-payment')">Hoàn tất</button></div>`;
+  } else if (payment.method === 'qr') {
+    html += `<div class="qr-box"><img src="${payment.qrFallback}" alt="Mã QR">
+      <p class="muted">Quét QR thanh toán ${fmt(payment.amount)}</p><p class="muted">Nội dung: ${payment.id}</p></div>${bank(payment.bankInfo)}${actions}`;
+  } else {
+    html += `<div class="alert info">🏦 Chuyển khoản ${fmt(payment.amount)}</div>${bank(payment.bankInfo)}${actions}`;
+  }
+  document.getElementById('payment-content').innerHTML = html;
+  openModal('modal-payment');
+}
+async function confirmPayment(id) {
+  try { await api('/payments/' + id + '/confirm', { method: 'POST' }); toast('✅ Đã xác nhận'); closeModal('modal-payment'); }
+  catch (e) { toast(e.message, true); }
+}
+
+/* UC04.2 ONLINE */
+let onlineProducts = [], onlineCart = [], onlinePayMethod = 'cash', onlineCustomer = null;
+let onlineRxImageDataUrl = '';
+let onlineRxStream = null;
+
+function initOnlineCustomer() {
+  const self = CURRENT_USER.maQuyen === 4;
+  document.getElementById('online-lookup').classList.toggle('hidden', self);
+  if (self) {
+    onlineCustomer = { maKH: CURRENT_USER.maND, hoTen: CURRENT_USER.hoTen };
+    document.getElementById('online-customer-info').innerHTML = `Khách: <b>${CURRENT_USER.hoTen}</b>`;
+  }
+}
+
+async function loadOnlineProducts() {
+  try { const { data } = await api('/products'); onlineProducts = data; renderOnlineProducts(); renderOnlineCart(); }
+  catch (e) { toast(e.message, true); }
+}
+function renderOnlineProducts() {
+  const q = (document.getElementById('online-search').value || '').toLowerCase();
+  const list = q ? onlineProducts.filter(p => p.tenThuoc.toLowerCase().includes(q)) : onlineProducts;
+  document.getElementById('online-products').innerHTML = list.map(p => productCard(p, 'addToOnlineCart', `Tồn: ${p.tonKho} · HSD: ${p.hanSuDung}`)).join('');
+}
+function addToOnlineCart(ma) {
+  const p = onlineProducts.find(x => x.maSP === ma); if (!p) return;
+  const f = onlineCart.find(i => i.maSP === ma);
+  if (f) f.qty++; else onlineCart.push({ maSP: ma, tenThuoc: p.tenThuoc, giaBan: p.giaBan, qty: 1, keDon: !!p.keDon });
+  renderOnlineCart();
+}
+function renderOnlineCart() {
+  document.getElementById('online-cart-body').innerHTML = cartRows(onlineCart, 'changeOnlineQty', 'removeOnlineItem');
+  const sub = onlineCart.reduce((s, i) => s + i.giaBan * i.qty, 0);
+  const promoCode = document.getElementById('online-promo').value;
+  const disc = calcPromoDiscount(sub, promoCode);
+  document.getElementById('online-subtotal').textContent = fmt(sub);
+  document.getElementById('online-discount').textContent = '-' + fmt(disc);
+  document.getElementById('online-grandtotal').textContent = fmt(Math.max(0, sub - disc));
+  const needRx = hasPrescriptionInCart(onlineCart);
+  document.getElementById('online-rx-box').classList.toggle('hidden', !needRx);
+  if (!needRx) stopOnlineRxCamera();
+}
+function changeOnlineQty(idx, d) { onlineCart[idx].qty += d; if (onlineCart[idx].qty <= 0) onlineCart.splice(idx, 1); renderOnlineCart(); }
+function removeOnlineItem(idx) { onlineCart.splice(idx, 1); renderOnlineCart(); }
+function selectOnlinePayMethod(m) {
+  onlinePayMethod = m;
+  document.querySelectorAll('#page-uc04b .pay-method').forEach(el => el.classList.toggle('selected', el.dataset.method === m));
+}
+
+async function openRxCamera() {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    toast('Trình duyệt không hỗ trợ camera, hãy chọn ảnh đơn thuốc từ thư viện', true);
+    return document.getElementById('online-rx-file').click();
+  }
+  try {
+    onlineRxStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+    document.getElementById('online-rx-video').srcObject = onlineRxStream;
+    document.getElementById('online-rx-camera-wrap').classList.remove('hidden');
+  } catch (e) {
+    toast('Không mở được camera đơn thuốc, hãy chọn ảnh từ thư viện', true);
+  }
+}
+function stopOnlineRxCamera() {
+  onlineRxStream?.getTracks().forEach(t => t.stop());
+  onlineRxStream = null;
+  const v = document.getElementById('online-rx-video');
+  if (v) v.srcObject = null;
+  document.getElementById('online-rx-camera-wrap').classList.add('hidden');
+}
+function saveOnlineRxDataUrl(dataUrl, label) {
+  onlineRxImageDataUrl = dataUrl;
+  const img = document.getElementById('online-rx-preview');
+  img.src = dataUrl;
+  img.classList.remove('hidden');
+  document.getElementById('online-rx-saved-status').innerHTML = `<span class="badge active">✓ Đã lưu ảnh đơn thuốc (${label})</span>`;
+}
+function captureOnlineRxPhoto() {
+  const v = document.getElementById('online-rx-video');
+  if (!v.videoWidth) return toast('Camera chưa sẵn sàng', true);
+  const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
+  c.getContext('2d').drawImage(v, 0, 0);
+  const dataUrl = c.toDataURL('image/jpeg', 0.88);
+  stopOnlineRxCamera();
+  saveOnlineRxDataUrl(dataUrl, 'Chụp lúc ' + new Date().toLocaleTimeString('vi-VN'));
+  toast('Đã chụp và lưu ảnh đơn thuốc');
+}
+function handleOnlineRxUpload(ev) {
+  const f = ev.target.files?.[0]; if (!f) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    saveOnlineRxDataUrl(e.target.result, f.name);
+    toast('Đã lưu ảnh đơn thuốc');
+  };
+  reader.readAsDataURL(f);
+  ev.target.value = '';
+}
+
+async function lookupOnlineCustomer() {
+  const phone = document.getElementById('online-phone').value.trim();
+  if (!phone) return toast('Nhập SĐT', true);
+  try {
+    const { data } = await api('/customers?phone=' + encodeURIComponent(phone));
+    if (!data.length) return toast('Không tìm thấy', true);
+    onlineCustomer = data[0];
+    document.getElementById('online-customer-info').innerHTML = `Khách: <b>${onlineCustomer.hoTen}</b> · Điểm: ${onlineCustomer.diemTichLuy}`;
+  } catch (e) { toast(e.message, true); }
+}
+
+async function checkoutOnline() {
+  if (!onlineCart.length) return toast('Giỏ trống', true);
+  if (!onlineCustomer) return toast('Chưa chọn khách', true);
+  const addr = document.getElementById('online-address').value.trim();
+  if (!addr) return toast('Nhập địa chỉ', true);
+  if (hasPrescriptionInCart(onlineCart) && !onlineRxImageDataUrl) {
+    return toast('Đơn hàng có thuốc kê đơn Online: bắt buộc chụp hoặc tải ảnh đơn thuốc lưu vào hệ thống', true);
+  }
+  const sub = onlineCart.reduce((s, i) => s + i.giaBan * i.qty, 0);
+  const promoCode = document.getElementById('online-promo').value;
+  const disc = calcPromoDiscount(sub, promoCode);
+  const total = Math.max(0, sub - disc);
+  const rxSaved = hasPrescriptionInCart(onlineCart) ? {
+    imageDataUrl: onlineRxImageDataUrl,
+    savedAt: new Date().toISOString()
+  } : null;
+
+  try {
+    const { data: payment } = await api('/payments', { method: 'POST', body: JSON.stringify({ method: onlinePayMethod, amount: total, orderInfo: 'ONLINE' }) });
+    const { data: order } = await api('/orders', { method: 'POST', body: JSON.stringify({
+      maKH: onlineCustomer.maKH, maND: CURRENT_USER.maND, diaChiGiao: addr,
+      ghiChu: document.getElementById('online-note').value.trim(),
+      maKM: promoCode, giamGia: disc, donThuocOnline: rxSaved, paymentId: payment.id,
+      chiTiet: onlineCart.map(i => ({ maSP: i.maSP, soLuong: i.qty, donGia: i.giaBan, thanhTien: i.giaBan * i.qty }))
+    })});
+    showPaymentModal(payment, `Đơn ${order.maDon}`, disc, promoCode);
+    onlineCart = [];
+    onlineRxImageDataUrl = '';
+    document.getElementById('online-rx-preview').classList.add('hidden');
+    document.getElementById('online-rx-saved-status').textContent = 'Chưa có ảnh đơn thuốc được lưu';
+    renderOnlineCart();
+    loadOrders();
+  } catch (e) { toast(e.message, true); }
+}
+
+async function loadOrders() {
+  try {
+    const all = (await api('/orders')).data;
+    const data = CURRENT_USER.maQuyen === 4 ? all.filter(o => o.maKH === CURRENT_USER.maND) : all;
+    const manage = CURRENT_USER.maQuyen <= 3;
+    if (!data.length) { document.getElementById('orders-table').innerHTML = '<div class="alert info">Chưa có đơn hàng nào</div>'; return; }
+    const sc = {'Chờ xác nhận':'pending','Đã xác nhận':'info','Đang giao':'info','Hoàn tất':'active','Hủy':'draft'};
+    const act = (o, from, to, label, cls) => manage && o.trangThai === from ? `<button class="btn ${cls} btn-sm" onclick="updateOrderStatus('${o.maDon}','${to}')">${label}</button>` : '';
+    document.getElementById('orders-table').innerHTML = wrap(
+      ['Mã đơn','Mã KH','Khuyến mãi','Đơn thuốc lưu','Tổng tiền','Trạng thái','Thao tác'],
+      data.map(o => `<tr>
+        <td><b>${o.maDon}</b></td>
+        <td>${o.maKH}</td>
+        <td>${o.maKM ? `<span class="badge active">${o.maKM} (-${fmt(o.giamGia)})</span>` : '<span class="muted">—</span>'}</td>
+        <td>${o.donThuocOnline?.imageDataUrl ? `<img src="${o.donThuocOnline.imageDataUrl}" alt="Đơn thuốc" style="width:48px;height:36px;object-fit:cover;border-radius:6px;border:1px solid var(--line)">` : '<span class="muted">Không cần</span>'}</td>
+        <td><b>${fmt(o.thanhTien)}</b></td>
+        <td><span class="badge ${sc[o.trangThai]}">${o.trangThai}</span></td>
+        <td>${act(o,'Chờ xác nhận','Đã xác nhận','Xác nhận','btn-primary')}${act(o,'Đã xác nhận','Đang giao','Giao','btn-success')}${act(o,'Đang giao','Hoàn tất','Hoàn tất','btn-success')}</td>
+      </tr>`).join('')
+    );
+  } catch (e) { toast(e.message, true); }
+}
+async function updateOrderStatus(id, status) {
+  try { await api('/orders/' + id + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }); toast('Đã cập nhật'); loadOrders(); }
+  catch (e) { toast(e.message, true); }
+}
+
+/* UC01 / UC06 */
+async function loadAccounts() {
+  try {
+    const [a, p, u, c, s] = await Promise.all([api('/auth/accounts'), api('/auth/permissions'), api('/users'), api('/customers'), api('/suppliers')]);
+    const nameOf = tk => (tk.maQuyen === 4 ? c.data.find(x => x.maKH === tk.maND)?.hoTen : tk.maQuyen === 5 ? s.data.find(x => x.maNCC === tk.maND)?.tenNCC : u.data.find(x => x.maND === tk.maND)?.hoTen) || '';
+    const opts = tk => p.data.filter(q => tk.maQuyen <= 3 ? q.maQuyen <= 3 : q.maQuyen === tk.maQuyen)
+      .map(q => `<option value="${q.maQuyen}" ${q.maQuyen === tk.maQuyen ? 'selected' : ''}>${q.tenQuyen}</option>`).join('');
+    document.getElementById('users-table').innerHTML = wrap(['Mã TK','Tên đăng nhập','Người dùng','Quyền','Trạng thái','Thao tác'],
+      a.data.map(tk => `<tr><td class="muted">${tk.maTK}</td><td><b>${tk.tenDangNhap}</b></td><td>${nameOf(tk)} <span class="muted">${tk.maND}</span></td>
+        <td><select class="field" style="padding:6px 10px;width:auto" onchange="changeRole('${tk.maTK}', this.value)">${opts(tk)}</select></td>
+        <td><span class="badge ${tk.trangThai ? 'active' : 'draft'}">${tk.trangThai ? 'Hoạt động' : 'Đã khóa'}</span></td>
+        <td><button class="btn btn-outline btn-sm" onclick="toggleAccount('${tk.maTK}', ${!tk.trangThai})">${tk.trangThai ? '🔒 Khóa' : '🔓 Mở khóa'}</button></td></tr>`).join(''));
+    document.getElementById('roles-table').innerHTML = wrap(['Mã quyền','Tên quyền','Mô tả','Số tài khoản'],
+      p.data.map(q => `<tr><td class="muted">${q.maQuyen}</td><td><b>${q.tenQuyen}</b></td><td>${q.moTa}</td><td><span class="badge active">${a.data.filter(t => t.maQuyen === q.maQuyen).length}</span></td></tr>`).join(''));
+  } catch (e) { toast(e.message, true); }
+}
+async function changeRole(maTK, maQuyen) {
+  try { await api('/auth/accounts/' + maTK + '/role', { method: 'PATCH', body: JSON.stringify({ maQuyen: Number(maQuyen) }) }); toast('Đã cập nhật quyền'); loadAccounts(); }
+  catch (e) { toast(e.message, true); }
+}
+async function toggleAccount(maTK, trangThai) {
+  try { await api('/auth/accounts/' + maTK + '/status', { method: 'PATCH', body: JSON.stringify({ trangThai }) }); toast(trangThai ? 'Đã mở khóa' : 'Đã khóa'); loadAccounts(); }
+  catch (e) { toast(e.message, true); }
+}
+function userType(u) {
+  return { admin: 'Quản trị viên', duocsitruong: 'Dược sĩ trưởng', duocsi: 'Dược sĩ' }[u.loai] || 'Người dùng';
+}
+async function loadUsers(target) {
+  try {
+    const { data } = await api('/users');
+    document.getElementById(target).innerHTML = wrap(['Mã','Họ tên','Email','Loại','Trạng thái'],
+      data.map(u => `<tr><td class="muted">${u.maND}</td><td><b>${u.hoTen}</b></td><td>${u.email || ''}</td><td>${userType(u)}</td><td><span class="badge active">${u.trangThai}</span></td></tr>`).join(''));
+  } catch (e) { toast(e.message, true); }
+}
+
+/* UC05 */
+let cusList = [];
+const val = id => document.getElementById(id).value.trim();
+function showErr(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.toggle('hidden', !msg); }
+async function loadCustomers() {
+  try {
+    const q = document.getElementById('customer-q').value;
+    const { data } = await api('/customers?q=' + encodeURIComponent(q));
+    cusList = data;
+    document.getElementById('customer-count').textContent = `Tổng: ${data.length} khách`;
+    const canDel = CURRENT_USER.maQuyen <= 2;
+    document.getElementById('customers-table').innerHTML = wrap(['Mã KH','Họ tên','SĐT','Giới tính','Email','Điểm','Thao tác'],
+      data.map(c => `<tr><td class="muted">${c.maKH}</td><td><b>${c.hoTen}</b></td><td>${c.sdt}</td><td>${c.gioiTinh || '—'}</td><td>${c.email || '—'}</td>
+        <td><span class="badge active">${c.diemTichLuy} điểm</span></td>
+        <td><div class="act"><button class="btn btn-outline btn-sm" onclick="viewCustomer('${c.maKH}')" title="Xem">👁</button>
+        <button class="btn btn-outline btn-sm" onclick="editCustomer('${c.maKH}')" title="Sửa">✏️</button>
+        ${canDel ? `<button class="btn btn-danger btn-sm" onclick="deleteCustomer('${c.maKH}')" title="Xóa">🗑</button>` : ''}</div></td></tr>`).join('') || emptyRow(7, 'Chưa có khách hàng phù hợp'));
+  } catch (e) { toast(e.message, true); }
+}
+function fillCustomer(c) {
+  document.getElementById('customer-modal-title').textContent = c ? 'Sửa khách hàng' : 'Thêm khách hàng';
+  document.getElementById('c-edit-id').value = c ? c.maKH : '';
+  document.getElementById('c-name').value = c?.hoTen || ''; document.getElementById('c-phone').value = c?.sdt || '';
+  document.getElementById('c-gender').value = c?.gioiTinh || ''; document.getElementById('c-email').value = c?.email || '';
+  showErr('customer-error', ''); openModal('modal-customer');
+}
+function openCustomerModal() { fillCustomer(null); }
+function editCustomer(ma) { fillCustomer(cusList.find(c => c.maKH === ma)); }
+async function saveCustomer() {
+  const id = val('c-edit-id');
+  const body = { hoTen: val('c-name'), sdt: val('c-phone'), gioiTinh: document.getElementById('c-gender').value, email: val('c-email') };
+  if (!body.hoTen || !body.sdt) return showErr('customer-error', 'Vui lòng nhập họ tên và SĐT');
+  try {
+    await api(id ? '/customers/' + id : '/customers', { method: id ? 'PUT' : 'POST', body: JSON.stringify(body) });
+    toast(id ? 'Đã cập nhật khách hàng' : 'Đã thêm khách hàng'); closeModal('modal-customer'); loadCustomers();
+  } catch (e) { showErr('customer-error', e.message); }
+}
+async function deleteCustomer(ma) {
+  const c = cusList.find(x => x.maKH === ma);
+  if (!confirm(`Xóa khách hàng "${c ? c.hoTen : ma}"?`)) return;
+  try { await api('/customers/' + ma, { method: 'DELETE' }); toast('Đã xóa'); loadCustomers(); }
+  catch (e) { toast(e.message, true); }
+}
+const kv = (rows) => `<div class="bank-info">${rows.map(r => `<div><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div>`;
+async function viewCustomer(ma) {
+  try {
+    const { data: c } = await api('/customers/' + ma);
+    const { data: h } = await api('/customers/' + ma + '/history');
+    document.getElementById('customer-detail-title').textContent = 'Khách hàng: ' + c.hoTen;
+    document.getElementById('customer-detail-body').innerHTML = kv([['Mã KH', c.maKH], ['SĐT', c.sdt], ['Giới tính', c.gioiTinh || '—'], ['Email', c.email || '—'], ['Điểm tích lũy', c.diemTichLuy + ' điểm']])
+      + `<h3>Lịch sử mua hàng (${h.length})</h3>` + (h.length ? wrap(['Mã HĐ','Ngày','Tổng tiền','Thanh toán'],
+        h.map(x => `<tr><td>${x.maHD}</td><td>${x.ngayLap ? new Date(x.ngayLap).toLocaleString('vi-VN') : '—'}</td><td><b>${fmt(x.tongTien)}</b></td><td>${x.hinhThucThanhToan || '—'}</td></tr>`).join('')) : '<div class="alert info">Chưa có giao dịch</div>');
+    openModal('modal-customer-detail');
+  } catch (e) { toast(e.message, true); }
+}
+
+/* UC07 */
+let supList = [];
+async function loadSuppliers() {
+  try {
+    const q = document.getElementById('supplier-q').value;
+    const { data } = await api('/suppliers?q=' + encodeURIComponent(q));
+    supList = data;
+    document.getElementById('supplier-count').textContent = `Tổng: ${data.length} nhà cung cấp`;
+    const canDel = CURRENT_USER.maQuyen === 1;
+    document.getElementById('suppliers-table').innerHTML = wrap(['Mã NCC','Tên','MST','SĐT','Email','Công nợ','Thao tác'],
+      data.map(s => `<tr><td class="muted">${s.maNCC}</td><td><b>${s.tenNCC}</b></td><td>${s.maSoThue || '—'}</td><td>${s.sdt || '—'}</td><td>${s.email || '—'}</td>
+        <td><span class="badge ${s.congNo > 0 ? 'pending' : 'active'}">${fmt(s.congNo)}</span></td>
+        <td><div class="act"><button class="btn btn-outline btn-sm" onclick="viewSupplier('${s.maNCC}')" title="Xem">👁</button>
+        <button class="btn btn-outline btn-sm" onclick="editSupplier('${s.maNCC}')" title="Sửa">✏️</button>
+        ${canDel ? `<button class="btn btn-danger btn-sm" onclick="deleteSupplier('${s.maNCC}')" title="Xóa">🗑</button>` : ''}</div></td></tr>`).join('') || emptyRow(7, 'Chưa có nhà cung cấp phù hợp'));
+  } catch (e) { toast(e.message, true); }
+}
+function fillSupplier(s) {
+  document.getElementById('supplier-modal-title').textContent = s ? 'Sửa nhà cung cấp' : 'Thêm nhà cung cấp';
+  document.getElementById('s-edit-id').value = s ? s.maNCC : '';
+  [['s-name','tenNCC'],['s-tax','maSoThue'],['s-address','diaChi'],['s-phone','sdt'],['s-email','email'],['s-note','ghiChu']].forEach(f => document.getElementById(f[0]).value = s?.[f[1]] || '');
+  showErr('supplier-error', ''); openModal('modal-supplier');
+}
+function openSupplierModal() { fillSupplier(null); }
+function editSupplier(ma) { fillSupplier(supList.find(s => s.maNCC === ma)); }
+async function saveSupplier() {
+  const id = val('s-edit-id');
+  const body = { tenNCC: val('s-name'), maSoThue: val('s-tax'), diaChi: val('s-address'), sdt: val('s-phone'), email: val('s-email'), ghiChu: val('s-note') };
+  if (!body.tenNCC) return showErr('supplier-error', 'Vui lòng nhập tên nhà cung cấp');
+  try {
+    await api(id ? '/suppliers/' + id : '/suppliers', { method: id ? 'PUT' : 'POST', body: JSON.stringify(body) });
+    toast(id ? 'Đã cập nhật nhà cung cấp' : 'Đã thêm nhà cung cấp'); closeModal('modal-supplier'); loadSuppliers();
+  } catch (e) { showErr('supplier-error', e.message); }
+}
+async function deleteSupplier(ma) {
+  const s = supList.find(x => x.maNCC === ma);
+  if (!confirm(`Xóa nhà cung cấp "${s ? s.tenNCC : ma}"?`)) return;
+  try { await api('/suppliers/' + ma, { method: 'DELETE' }); toast('Đã xóa'); loadSuppliers(); }
+  catch (e) { toast(e.message, true); }
+}
+async function viewSupplier(ma) {
+  try {
+    const { data: s } = await api('/suppliers/' + ma);
+    const { data: h } = await api('/suppliers/' + ma + '/history');
+    document.getElementById('supplier-detail-title').textContent = 'Nhà cung cấp: ' + s.tenNCC;
+    document.getElementById('supplier-detail-body').innerHTML = kv([['Mã NCC', s.maNCC], ['Mã số thuế', s.maSoThue || '—'], ['Địa chỉ', s.diaChi || '—'], ['SĐT', s.sdt || '—'], ['Email', s.email || '—'], ['Công nợ', fmt(s.congNo)]])
+      + `<h3>Lịch sử giao dịch (${h.length})</h3>` + (h.length ? wrap(['Mã phiếu','Ngày nhập','Tổng tiền'],
+        h.map(x => `<tr><td>${x.maPN}</td><td>${x.ngayNhap || '—'}</td><td><b>${fmt(x.tongTien)}</b></td></tr>`).join('')) : '<div class="alert info">Chưa có giao dịch</div>');
+    openModal('modal-supplier-detail');
+  } catch (e) { toast(e.message, true); }
+}
+
+restoreSession();
+</script>
+</body>
+</html>
